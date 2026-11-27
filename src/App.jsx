@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import MapView from "./components/MapView.jsx";
 import RowForm from "./components/RowForm.jsx";
-import EditModal from "./components/EditModal.jsx";
+import FormModal from "./components/FormModal.jsx";
 import ConfirmModal from "./components/ConfirmModal.jsx";
 import FilterBar, { EMPTY_FILTERS } from "./components/FilterBar.jsx";
 import { ACHEMINEMENTS, STATUTS } from "./data/acheminements.js";
@@ -83,6 +83,7 @@ export default function App() {
   const [mapStyle, setMapStyle] = useState("basic");
   const [dark, setDark] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [adding, setAdding] = useState(false);
   const [confirm, setConfirm] = useState(null); // { kind: "delete", row } | { kind: "save", id, values }
   const [notice, setNotice] = useState("");
   const fileRef = useRef(null);
@@ -264,9 +265,10 @@ export default function App() {
       {!loaded && <div className="notice">Chargement des points depuis {POINTS_URL}…</div>}
       <div className="layout">
         <aside className="sidebar">
-          <div className="add-form">
-            <h2>Ajouter une ligne</h2>
-            <RowForm onSubmit={addRow} submitLabel="➕ Ajouter sur la carte" />
+          <div className="add-panel">
+            <button type="button" className="submit-btn" onClick={() => setAdding(true)}>
+              ➕ Ajouter une ligne
+            </button>
           </div>
           <Legend />
         </aside>
@@ -281,11 +283,24 @@ export default function App() {
           />
         </div>
       </div>
+      {adding && (
+        <FormModal
+          title="➕ Ajouter une ligne"
+          onSubmit={(v) => {
+            addRow(v);
+            setAdding(false);
+          }}
+          onCancel={() => setAdding(false)}
+          submitLabel="➕ Ajouter sur la carte"
+        />
+      )}
       {editing && (
-        <EditModal
-          row={editing}
+        <FormModal
+          title={`✏️ Modifier — ${editing.departement}`}
+          initial={editing}
           onSubmit={(v) => setConfirm({ kind: "save", id: editing.id, values: v })}
           onCancel={() => setEditingId(null)}
+          submitLabel="💾 Enregistrer"
         />
       )}
       {confirm?.kind === "delete" && (
