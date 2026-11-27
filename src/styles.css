@@ -229,6 +229,7 @@ body.dark { background: #0b1220; color: #e2e8f0; }
 }
 .map-controls button + button { border-left: 1px solid var(--border); }
 .map-controls button.active { background: #0ea5e9; color: #fff; font-weight: 700; }
+.ctrl-sep { width: 1px; background: var(--border); }
 
 .insets {
   position: absolute;

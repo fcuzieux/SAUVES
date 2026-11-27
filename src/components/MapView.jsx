@@ -118,18 +118,18 @@ function MarkersLayer({ rows, cluster }) {
   return null;
 }
 
-function FitBounds({ rows }) {
+function FitBounds({ rows, view }) {
   const map = useMap();
   useEffect(() => {
-    const pts = rows
-      .map((r) => resolveCoords(r.departement))
-      .filter((c) => c.zone === "metro")
-      .map((c) => [c.lat, c.lng]);
-    if (pts.length) {
-      const b = L.latLngBounds(pts);
+    const all = rows.map((r) => resolveCoords(r.departement));
+    // "monde" = tous les points (métropole + DOM-TOM) ; "metro" = métropole seule
+    const pts = view === "monde" ? all : all.filter((c) => c.zone === "metro");
+    const list = pts.length ? pts : all;
+    if (list.length) {
+      const b = L.latLngBounds(list.map((c) => [c.lat, c.lng]));
       if (b.isValid()) map.fitBounds(b.pad(0.12));
     }
-  }, [rows, map]);
+  }, [rows, view, map]);
   return null;
 }
 
@@ -164,17 +164,17 @@ function Inset({ def, rows, style }) {
 }
 
 export default function MapView({ rows, style, dark, onStyleChange, onSelectDept }) {
-  const metroRows = rows.filter((r) => resolveCoords(r.departement).zone === "metro");
+  const [view, setView] = useState("metro");
   const s = MAP_STYLES[style] ?? MAP_STYLES.basic;
   return (
     <div className="map-area">
       <MapContainer center={[46.6, 2.5]} zoom={6} className="main-map">
         <TileLayer key={style} url={s.url} attribution={s.attr} />
         <DepartmentsLayer dark={dark} onSelectDept={onSelectDept} />
-        <FitBounds rows={rows} />
-        <MarkersLayer rows={metroRows} cluster={true} />
+        <FitBounds rows={rows} view={view} />
+        <MarkersLayer rows={rows} cluster={true} />
       </MapContainer>
-      <div className="map-controls" title="Style de carte">
+      <div className="map-controls" title="Style de carte et zone">
         {Object.entries(MAP_STYLES).map(([k, v]) => (
           <button
             key={k}
@@ -185,6 +185,23 @@ export default function MapView({ rows, style, dark, onStyleChange, onSelectDept
             {v.label}
           </button>
         ))}
+        <span className="ctrl-sep" />
+        <button
+          type="button"
+          className={view === "metro" ? "active" : ""}
+          onClick={() => setView("metro")}
+          title="Zoom sur la France métropolitaine"
+        >
+          🇫🇷 Métropole
+        </button>
+        <button
+          type="button"
+          className={view === "monde" ? "active" : ""}
+          onClick={() => setView("monde")}
+          title="Carte mondiale : toutes les opérations, DOM-TOM compris"
+        >
+          🌍 Monde
+        </button>
       </div>
       <div className="insets">
         {INSETS.map((def) => (
