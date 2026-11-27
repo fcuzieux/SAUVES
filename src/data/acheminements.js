@@ -11,7 +11,7 @@ export const ACHEMINEMENTS = [
 
 export const STATUTS = [
   { id: "routine", label: "Routine", borderStyle: "solid" },
-  { id: "expedition", label: "Expédition en cours", borderStyle: "solid", doubleRing: true },
+  { id: "expedition", label: "Expérimentation en cours", borderStyle: "solid", doubleRing: true },
   { id: "projet", label: "Projet", borderStyle: "dashed" },
   { id: "demo", label: "Démo faisabilité", borderStyle: "dotted", star: true },
   { id: "aucun", label: "Aucun", borderStyle: "solid", muted: true },
