@@ -397,6 +397,11 @@ body.dark { background: #0b1220; color: #e2e8f0; }
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
 }
 .modal h2 { margin: 0 0 0.75rem; font-size: 1rem; }
+.confirm-overlay { z-index: 3000; } /* au-dessus de la modale d'édition */
+.confirm-modal { width: 420px; }
+.confirm-modal p { font-size: 0.85rem; color: var(--muted); margin: 0 0 1rem; }
+.danger-btn { background: #dc2626; }
+.danger-btn:hover { background: #b91c1c; }
 
 @media print {
   .sidebar, .filter-bar, .map-controls, .insets, .header-actions, .notice, .modal-overlay { display: none !important; }

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import MapView from "./components/MapView.jsx";
 import RowForm from "./components/RowForm.jsx";
 import EditModal from "./components/EditModal.jsx";
+import ConfirmModal from "./components/ConfirmModal.jsx";
 import FilterBar, { EMPTY_FILTERS } from "./components/FilterBar.jsx";
 import { ACHEMINEMENTS, STATUTS } from "./data/acheminements.js";
 import { seed } from "./data/seed.js";
@@ -82,6 +83,7 @@ export default function App() {
   const [mapStyle, setMapStyle] = useState("basic");
   const [dark, setDark] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [confirm, setConfirm] = useState(null); // { kind: "delete", row } | { kind: "save", id, values }
   const [notice, setNotice] = useState("");
   const fileRef = useRef(null);
 
@@ -149,12 +151,21 @@ export default function App() {
       const btn = e.target.closest("[data-action]");
       if (!btn) return;
       if (btn.dataset.action === "edit") setEditingId(btn.dataset.id);
-      if (btn.dataset.action === "delete") deleteRow(btn.dataset.id);
+      if (btn.dataset.action === "delete") {
+        const row = rowsRef.current.find((x) => x.id === btn.dataset.id);
+        if (row) setConfirm({ kind: "delete", row });
+      }
     };
     document.addEventListener("click", h);
     return () => document.removeEventListener("click", h);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // rowsRef pour lire les lignes courantes dans la délégation de clics
+  const rowsRef = useRef(rows);
+  useEffect(() => {
+    rowsRef.current = rows;
+  }, [rows]);
 
   const addRow = (values) => {
     const row = normalizeRow({ ...values, id: newId() });
@@ -273,8 +284,32 @@ export default function App() {
       {editing && (
         <EditModal
           row={editing}
-          onSubmit={(v) => updateRow(editing.id, v)}
+          onSubmit={(v) => setConfirm({ kind: "save", id: editing.id, values: v })}
           onCancel={() => setEditingId(null)}
+        />
+      )}
+      {confirm?.kind === "delete" && (
+        <ConfirmModal
+          title="Supprimer cette ligne ?"
+          message={`« ${confirm.row.departement} — ${confirm.row.beneficiaire} » sera définitivement supprimée de la carte.`}
+          confirmLabel="🗑 Supprimer"
+          onConfirm={() => {
+            deleteRow(confirm.row.id);
+            setConfirm(null);
+          }}
+          onCancel={() => setConfirm(null)}
+        />
+      )}
+      {confirm?.kind === "save" && (
+        <ConfirmModal
+          title="Enregistrer les modifications ?"
+          message={`Les modifications sur « ${confirm.values.departement} — ${confirm.values.beneficiaire} » seront appliquées et journalisées dans l'historique.`}
+          confirmLabel="💾 Enregistrer"
+          onConfirm={() => {
+            updateRow(confirm.id, confirm.values);
+            setConfirm(null);
+          }}
+          onCancel={() => setConfirm(null)}
         />
       )}
     </div>
