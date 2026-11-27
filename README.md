@@ -35,6 +35,12 @@ de France avec encarts DOM-TOM (Guyane, Antilles, La Réunion, Mayotte).
   dans le GeoJSON des départements (métropole + DOM-TOM) et les champs **Région / Département sont
   automatiquement remplis et verrouillés** (point hors France/DOM-TOM = erreur). Sans lat/lng,
   l'utilisateur choisit Région puis Département (centroïde automatique).
+- **Collectivités d'outre-mer (COM)** : Saint-Pierre-et-Miquelon, Saint-Martin, Saint-Barthélemy,
+  Wallis-et-Futuna, Polynésie française, Nouvelle-Calédonie ajoutées en bas de la liste
+  « Région/Collectivité ». En choisissant une COM, le champ Département est grisé et forcé à
+  **COM** (écrit tel quel dans le JSON/CSV) ; le point est placé sur le territoire (encarts
+  SPM et Pacifique en plus des DOM-TOM, vue 🌍 Monde incluse). En COM, le reverse geocoding
+  n'est pas requis (le territoire est déjà choisi).
 
 ## Clef API CARTO (styles Positron / Dark Matter)
 

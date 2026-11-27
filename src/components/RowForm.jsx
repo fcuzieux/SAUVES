@@ -21,6 +21,9 @@ export default function RowForm({ initial, onSubmit, onCancel, submitLabel = "En
   const [lng, setLng] = useState(initial?.lng ?? "");
   const [error, setError] = useState("");
 
+  const regionDef = REGIONS.find((x) => x.name === region);
+  const isCOM = Boolean(regionDef?.com); // collectivité d'outre-mer -> département forcé à "COM"
+
   // Quand l'utilisateur a double-cliqué sur la carte en mode "picking", on pré-remplit lat/lng
   useEffect(() => {
     if (pickedLL) {
@@ -68,9 +71,6 @@ export default function RowForm({ initial, onSubmit, onCancel, submitLabel = "En
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lat, lng, isCOM, region]);
-
-  const regionDef = REGIONS.find((x) => x.name === region);
-  const isCOM = Boolean(regionDef?.com); // collectivité d'outre-mer -> département forcé à "COM"
 
   const depts = useMemo(() => {
     const r = REGIONS.find((x) => x.name === region);
