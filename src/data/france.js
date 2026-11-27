@@ -139,17 +139,43 @@ const norm = (s) =>
 
 const BY_NORM = Object.fromEntries(Object.values(DEPARTMENTS).map((d) => [norm(d.nom), d]));
 
-// "Aisne / Nord" -> moyenne des centroïdes des départements nommés
-export function resolveCoords(departement) {
+// Bounding boxes des zones DOM-TOM (pour classer un lat/lng manuel)
+const DOM_BOXES = [
+  { zone: "guyane", lat: [1.5, 6], lng: [-55, -51] },
+  { zone: "antilles", lat: [14, 17], lng: [-62.5, -60.3] },
+  { zone: "reunion", lat: [-21.5, -20.7], lng: [55.2, 55.9] },
+  { zone: "mayotte", lat: [-13.2, -12.5], lng: [44.9, 45.4] },
+];
+export function zoneFromLatLng(lat, lng) {
+  for (const b of DOM_BOXES) {
+    if (lat >= b.lat[0] && lat <= b.lat[1] && lng >= b.lng[0] && lng <= b.lng[1]) return b.zone;
+  }
+  return "metro";
+}
+
+// Résout la position d'une ligne : lat/lng manuels prioritaires, sinon centroïde du département
+export function resolveCoords(departement, lat, lng) {
   const parts = String(departement)
     .split("/")
     .map((p) => p.trim())
     .filter(Boolean);
   const found = parts.map((p) => BY_NORM[norm(p)]).filter(Boolean);
-  if (!found.length) return { lat: 46.6, lng: 2.5, zone: "metro", code: null };
-  const lat = found.reduce((a, d) => a + d.lat, 0) / found.length;
-  const lng = found.reduce((a, d) => a + d.lng, 0) / found.length;
-  return { lat, lng, zone: found[0].zone, code: found[0].code };
+  const base = found.length
+    ? {
+        lat: found.reduce((a, d) => a + d.lat, 0) / found.length,
+        lng: found.reduce((a, d) => a + d.lng, 0) / found.length,
+        zone: found[0].zone,
+        code: found[0].code,
+      }
+    : { lat: 46.6, lng: 2.5, zone: "metro", code: null };
+  const la = +lat, ln = +lng;
+  const hasLL =
+    Number.isFinite(la) && Number.isFinite(ln) &&
+    !(la === 0 && ln === 0) && Math.abs(la) <= 90 && Math.abs(ln) <= 180;
+  if (hasLL) {
+    return { lat: la, lng: ln, zone: found.length ? base.zone : zoneFromLatLng(la, ln), code: base.code };
+  }
+  return base;
 }
 
 // Retrouve le code département à partir de la région + du nom (pré-remplissage du formulaire)

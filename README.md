@@ -24,8 +24,13 @@ de France avec encarts DOM-TOM (Guyane, Antilles, La Réunion, Mayotte).
   désactivable via le bouton 🧲 Clusters), vue 🌍 Monde incluant les DOM-TOM.
 - **Export / import** : CSV (séparateur `;`, compatible Excel) et JSON ; import de fichier
   `.csv`/`.json` (les lignes sont ajoutées à la base).
-- **Persistance** `localStorage` (seed = les 42 lignes du tableau initial), réinitialisation
-  possible depuis l'en-tête.
+- **Fichier de données** : les points sont chargés **au démarrage** depuis `public/data/points.json`
+  (42 lignes initiales) — édite ce fichier pour modifier la base sans toucher au code ; le bouton
+  « Réinitialiser » recharge ce fichier. Repli sur le seed embarqué si le fichier est illisible.
+  Les modifications faites dans l'UI sont en plus persistées en `localStorage`.
+- **Position manuelle** : chaque ligne peut avoir `lat`/`lng` (champs optionnels du formulaire,
+  aussi dans le JSON/CSV) — si renseignés, le point est placé exactement là (prioritaire sur le
+  centroïde du département) ; la fiche au survol affiche « 📍 position manuelle ».
 
 ## Clef API CARTO (styles Positron / Dark Matter)
 

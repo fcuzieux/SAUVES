@@ -9,8 +9,20 @@ import { normalizeRow, newId, toCSV, fromCSV, fromJSON, download, readTextFile }
 import { pushHistory } from "./utils/history.js";
 
 const LS_KEY = "acheminements_db_v2";
+const POINTS_URL = "/data/points.json"; // fichier JSON servi depuis public/, chargé au démarrage
 
-function loadRows() {
+// Charge les points depuis public/data/points.json (source de vérité éditable),
+// avec repli sur le seed embarqué si le fichier est illisible.
+async function fetchPointsFile() {
+  const r = await fetch(POINTS_URL);
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  const data = await r.json();
+  const arr = Array.isArray(data) ? data : data.rows;
+  if (!Array.isArray(arr)) throw new Error("format invalide");
+  return arr.map(normalizeRow);
+}
+
+function loadStored() {
   try {
     const raw = localStorage.getItem(LS_KEY);
     if (raw) {
@@ -20,7 +32,7 @@ function loadRows() {
   } catch {
     /* ignore */
   }
-  return seed.map((r) => ({ ...r, statuts: r.statuts.map((s) => ({ ...s })) }));
+  return null;
 }
 
 function Legend() {
@@ -63,7 +75,8 @@ function Legend() {
 }
 
 export default function App() {
-  const [rows, setRows] = useState(loadRows);
+  const [rows, setRows] = useState([]);
+  const [loaded, setLoaded] = useState(false);
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const [mapStyle, setMapStyle] = useState("basic");
   const [dark, setDark] = useState(false);
@@ -71,13 +84,37 @@ export default function App() {
   const [notice, setNotice] = useState("");
   const fileRef = useRef(null);
 
+  // Chargement initial : localStorage (modifs utilisateur) sinon points.json au démarrage
   useEffect(() => {
+    (async () => {
+      const stored = loadStored();
+      if (stored) {
+        setRows(stored);
+        setLoaded(true);
+        return;
+      }
+      try {
+        const fromFile = await fetchPointsFile();
+        setRows(fromFile);
+        setNotice(`${fromFile.length} points chargés depuis ${POINTS_URL}`);
+      } catch {
+        const fallback = seed.map((r) => ({ ...r, statuts: r.statuts.map((s) => ({ ...s })) }));
+        setRows(fallback);
+        setNotice(`${POINTS_URL} illisible — seed embarqué utilisé (${fallback.length} points)`);
+      }
+      setLoaded(true);
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!loaded) return;
     try {
       localStorage.setItem(LS_KEY, JSON.stringify(rows));
     } catch {
       /* ignore */
     }
-  }, [rows]);
+  }, [rows, loaded]);
 
   useEffect(() => {
     document.body.classList.toggle("dark", dark);
@@ -146,11 +183,18 @@ export default function App() {
     if (r) setNotice(`Ligne supprimée : ${r.departement}`);
   };
 
-  const resetSeed = () => {
+  const resetSeed = async () => {
     localStorage.removeItem(LS_KEY);
-    setRows(seed.map((r) => ({ ...r, statuts: r.statuts.map((s) => ({ ...s })) })));
+    try {
+      const fromFile = await fetchPointsFile();
+      setRows(fromFile);
+      setNotice(`Données réinitialisées depuis ${POINTS_URL} (${fromFile.length} points)`);
+    } catch {
+      const fallback = seed.map((r) => ({ ...r, statuts: r.statuts.map((s) => ({ ...s })) }));
+      setRows(fallback);
+      setNotice("Réinitialisation sur le seed embarqué (points.json illisible)");
+    }
     setFilters(EMPTY_FILTERS);
-    setNotice("Données réinitialisées (42 lignes du tableau initial)");
   };
 
   const exportCSV = () => download("acheminements.csv", toCSV(rows), "text/csv;charset=utf-8");
@@ -205,6 +249,7 @@ export default function App() {
       {notice && (
         <div className="notice" onClick={() => setNotice("")}>{notice} ✕</div>
       )}
+      {!loaded && <div className="notice">Chargement des points depuis {POINTS_URL}…</div>}
       <div className="layout">
         <aside className="sidebar">
           <div className="add-form">

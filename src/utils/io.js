@@ -19,11 +19,19 @@ export function download(filename, content, mime) {
   URL.revokeObjectURL(url);
 }
 
+const num = (v) => {
+  if (v === "" || v == null) return undefined;
+  const n = +v;
+  return Number.isFinite(n) ? n : undefined;
+};
+
 export function normalizeRow(r) {
   const statuts =
     Array.isArray(r.statuts) && r.statuts.length
       ? r.statuts.map((s) => ({ statut: String(s.statut || "aucun"), annee: String(s.annee || "") }))
       : [{ statut: String(r.statut || "aucun"), annee: String(r.annee || "") }];
+  const lat = num(r.lat);
+  const lng = num(r.lng);
   return {
     id: r.id || newId(),
     region: String(r.region || ""),
@@ -36,6 +44,9 @@ export function normalizeRow(r) {
     note: String(r.note || ""),
     files: Array.isArray(r.files) ? r.files : [],
     history: Array.isArray(r.history) ? r.history.slice(-20) : [],
+    // coordonnées manuelles optionnelles (prioritaires sur le centroïde du département)
+    lat: lat !== undefined && lng !== undefined ? lat : undefined,
+    lng: lat !== undefined && lng !== undefined ? lng : undefined,
   };
 }
 
@@ -47,7 +58,7 @@ const csvEsc = (v) => {
 };
 
 export function toCSV(rows) {
-  const head = ["id", "region", "departement", "beneficiaire", "acheminements", "statuts", "note"];
+  const head = ["id", "region", "departement", "beneficiaire", "acheminements", "statuts", "note", "lat", "lng"];
   const lines = [head.join(";")];
   for (const r of rows) {
     lines.push(
@@ -59,6 +70,8 @@ export function toCSV(rows) {
         (r.acheminements || []).join("|"),
         (r.statuts || []).map((s) => `${s.statut}:${s.annee || ""}`).join("|"),
         r.note || "",
+        r.lat ?? "",
+        r.lng ?? "",
       ]
         .map(csvEsc)
         .join(";")
@@ -112,6 +125,8 @@ export function fromCSV(text) {
         })
         .filter((s) => s.statut),
       note: cols[idx.note] || "",
+      lat: idx.lat !== undefined ? cols[idx.lat] : undefined,
+      lng: idx.lng !== undefined ? cols[idx.lng] : undefined,
     })
   );
 }

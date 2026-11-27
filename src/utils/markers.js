@@ -77,9 +77,11 @@ export function pointCardHTML(row) {
         `<div class="hist-item"><span class="hist-date">${esc(new Date(h.t).toLocaleString("fr-FR"))}</span> <b>${esc(h.action)}</b>${h.detail ? ` — ${esc(h.detail)}` : ""}</div>`
     )
     .join("");
+  const hasLL = Number.isFinite(row.lat) && Number.isFinite(row.lng);
   return `<div class="point-card">
     <div class="pc-head"><strong>${esc(row.departement)}</strong><span class="pc-region">${esc(row.region)}</span></div>
     <div class="pc-row">🏥 ${esc(row.beneficiaire)}</div>
+    ${hasLL ? `<div class="pc-row pc-ll">📍 ${row.lat.toFixed(5)}, ${row.lng.toFixed(5)} <small>(position manuelle)</small></div>` : ""}
     <div class="pc-achs">${chips}</div>
     <div class="pc-statuts">${badges}</div>
     ${row.note ? `<div class="pc-note">${esc(row.note)}</div>` : ""}

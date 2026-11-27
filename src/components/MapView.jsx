@@ -101,7 +101,7 @@ function MarkersLayer({ rows, cluster }) {
       ? L.markerClusterGroup({ maxClusterRadius: 45 })
       : L.layerGroup();
     for (const r of rows) {
-      const c = resolveCoords(r.departement);
+      const c = resolveCoords(r.departement, r.lat, r.lng);
       const m = L.marker([c.lat, c.lng], { icon: markerIcon(r) });
       m.bindTooltip(pointCardHTML(r), {
         direction: "top",
@@ -121,7 +121,7 @@ function MarkersLayer({ rows, cluster }) {
 function FitBounds({ rows, view }) {
   const map = useMap();
   useEffect(() => {
-    const all = rows.map((r) => resolveCoords(r.departement));
+    const all = rows.map((r) => resolveCoords(r.departement, r.lat, r.lng));
     // "monde" = tous les points (métropole + DOM-TOM) ; "metro" = métropole seule
     const pts = view === "monde" ? all : all.filter((c) => c.zone === "metro");
     const list = pts.length ? pts : all;
@@ -141,7 +141,7 @@ const INSETS = [
 ];
 
 function Inset({ def, rows, style }) {
-  const pts = rows.filter((r) => resolveCoords(r.departement).zone === def.zone);
+  const pts = rows.filter((r) => resolveCoords(r.departement, r.lat, r.lng).zone === def.zone);
   if (!pts.length) return null;
   const s = MAP_STYLES[style] ?? MAP_STYLES.basic;
   return (

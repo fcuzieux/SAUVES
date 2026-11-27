@@ -16,6 +16,8 @@ export default function RowForm({ initial, onSubmit, onCancel, submitLabel = "En
   );
   const [note, setNote] = useState(initial?.note ?? "");
   const [files, setFiles] = useState(initial?.files ?? []);
+  const [lat, setLat] = useState(initial?.lat ?? "");
+  const [lng, setLng] = useState(initial?.lng ?? "");
   const [error, setError] = useState("");
 
   const depts = useMemo(() => {
@@ -53,6 +55,14 @@ export default function RowForm({ initial, onSubmit, onCancel, submitLabel = "En
     if (!beneficiaire.trim()) return setError("Renseigne le bénéficiaire (ex. « 2 CHG »).");
     if (!achs.length) return setError("Coche au moins un type d'acheminement.");
     if (!statuts.length) return setError("Ajoute au moins un statut.");
+    const hasLat = lat.trim() !== "";
+    const hasLng = lng.trim() !== "";
+    if (hasLat !== hasLng) return setError("Renseigne latitude ET longitude, ou aucune des deux.");
+    const la = hasLat ? +lat : undefined;
+    const ln = hasLng ? +lng : undefined;
+    if (hasLat && (!Number.isFinite(la) || !Number.isFinite(ln) || Math.abs(la) > 90 || Math.abs(ln) > 180)) {
+      return setError("Coordonnées invalides (lat -90..90, lng -180..180).");
+    }
     onSubmit({
       region,
       departement: DEPT_BY_CODE[code].nom,
@@ -61,6 +71,8 @@ export default function RowForm({ initial, onSubmit, onCancel, submitLabel = "En
       statuts: statuts.map((s) => ({ statut: s.statut, annee: s.annee.trim() })),
       note: note.trim(),
       files,
+      lat: hasLat ? la : undefined,
+      lng: hasLng ? ln : undefined,
     });
   };
 
@@ -129,6 +141,21 @@ export default function RowForm({ initial, onSubmit, onCancel, submitLabel = "En
         Note (optionnel)
         <input type="text" value={note} onChange={(e) => setNote(e.target.value)} placeholder="ex. contrat cadre, prestataire…" />
       </label>
+
+      <fieldset>
+        <legend>Position manuelle (optionnel)</legend>
+        <div className="ll-row">
+          <label>
+            Latitude
+            <input type="number" step="any" value={lat} onChange={(e) => setLat(e.target.value)} placeholder="ex. 45.7640" />
+          </label>
+          <label>
+            Longitude
+            <input type="number" step="any" value={lng} onChange={(e) => setLng(e.target.value)} placeholder="ex. 4.8357" />
+          </label>
+        </div>
+        <small className="hint">Si renseignées, le point est placé exactement ici (prioritaire sur le centroïde du département). Sinon, centroïde automatique.</small>
+      </fieldset>
 
       <fieldset>
         <legend>Pièces jointes (optionnel)</legend>
