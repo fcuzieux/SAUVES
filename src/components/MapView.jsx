@@ -67,30 +67,48 @@ const deptStyle = (dark) => ({
   fillOpacity: dark ? 0.06 : 0.04,
 });
 
-function DepartmentsLayer({ dark, onSelectDept }) {
+function DepartmentsLayer({ dark, onSelectDept, picking }) {
   const map = useMap();
+  const [layer, setLayer] = useState(null);
+  const pickingRef = useRef(picking);
+  pickingRef.current = picking;
+
   useEffect(() => {
-    let layer = null;
     let cancelled = false;
+    let l = null;
     loadDepts().then((data) => {
       if (cancelled || !data) return;
-      layer = L.geoJSON(data, {
+      l = L.geoJSON(data, {
         style: () => deptStyle(dark),
-        onEachFeature: (f, l) => {
+        onEachFeature: (f, fLayer) => {
           const { nom } = deptProps(f);
-          if (nom) l.bindTooltip(nom, { sticky: true, direction: "top", className: "dept-tooltip" });
-          l.on("click", () => onSelectDept?.(nom));
-          l.on("mouseover", () => l.setStyle({ weight: 3, color: "#0ea5e9", fillOpacity: 0.18 }));
-          l.on("mouseout", () => layer && layer.resetStyle(l));
+          if (nom) fLayer.bindTooltip(nom, { sticky: true, direction: "top", className: "dept-tooltip" });
+          fLayer.on("click", () => onSelectDept?.(nom));
+          fLayer.on("mouseover", () => fLayer.setStyle({ weight: 3, color: "#0ea5e9", fillOpacity: 0.18 }));
+          fLayer.on("mouseout", () => l && l.resetStyle(fLayer));
         },
       });
-      layer.addTo(map);
+      setLayer(l);
+      // pendant le picking, on ne remet PAS le layer (il intercepterait le double-clic)
+      if (!pickingRef.current) l.addTo(map);
     });
     return () => {
       cancelled = true;
-      if (layer) map.removeLayer(layer);
+      if (l) map.removeLayer(l);
+      setLayer(null);
     };
   }, [map, dark, onSelectDept]);
+
+  // Pendant le picking : le layer départements est retiré de la carte (le double-clic doit atteindre la carte)
+  useEffect(() => {
+    if (!layer) return;
+    if (picking) {
+      if (map.hasLayer(layer)) map.removeLayer(layer);
+    } else if (!map.hasLayer(layer)) {
+      layer.addTo(map);
+    }
+  }, [layer, picking, map]);
+
   return null;
 }
 
@@ -144,6 +162,7 @@ function MarkersLayer({ rows, cluster, picking }) {
         if (!pinned.has(r.id)) m.closeTooltip();
       });
       m.on("click", (e) => {
+        if (picking) return; // en mode picking, on laisse passer les événements vers la carte (double-clic)
         L.DomEvent.stop(e); // le clic sur un point ne doit pas fermer les fiches (événement carte)
         if (pinned.has(r.id)) {
           pinned.delete(r.id);
@@ -242,7 +261,7 @@ export default function MapView({ rows, style, dark, onStyleChange, onSelectDept
     <div className="map-area">
       <MapContainer center={[46.6, 2.5]} zoom={6} className="main-map">
         <TileLayer key={style} url={s.url} attribution={s.attr} />
-        <DepartmentsLayer dark={dark} onSelectDept={onSelectDept} />
+        <DepartmentsLayer dark={dark} onSelectDept={onSelectDept} picking={picking} />
         <FitBounds rows={rows} view={view} />
         <PickHandler picking={picking} onPick={onPick} />
         <MarkersLayer rows={rows} cluster={cluster} picking={picking} />
