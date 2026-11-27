@@ -150,11 +150,20 @@ function MarkersLayer({ rows, cluster }) {
     const onKey = (e) => {
       if (e.key === "Escape") closeAll();
     };
+    // Zoom / re-cluster : les marqueurs ré-ajoutés rouvrent leurs tooltips permanent ->
+    // on referme tout ce qui n'est pas épinglé (les fiches épinglées restent ouvertes)
+    const closeUnpinned = () => {
+      for (const id in byId) if (!pinned.has(id)) byId[id].closeTooltip();
+    };
     map.on("click", onMapClick);
+    map.on("zoomend", closeUnpinned);
+    if (cluster && layer.on) layer.on("animationend", closeUnpinned);
     document.addEventListener("keydown", onKey);
 
     return () => {
       map.off("click", onMapClick);
+      map.off("zoomend", closeUnpinned);
+      if (cluster && layer.off) layer.off("animationend", closeUnpinned);
       document.removeEventListener("keydown", onKey);
       map.removeLayer(layer);
     };
