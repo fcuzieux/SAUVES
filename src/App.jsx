@@ -84,6 +84,8 @@ export default function App() {
   const [dark, setDark] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [adding, setAdding] = useState(false);
+  const [picking, setPicking] = useState(false);
+  const [pickedLL, setPickedLL] = useState(null);
   const [confirm, setConfirm] = useState(null); // { kind: "delete", row } | { kind: "save", id, values }
   const [notice, setNotice] = useState("");
   const fileRef = useRef(null);
@@ -280,17 +282,27 @@ export default function App() {
             dark={dark}
             onStyleChange={setMapStyle}
             onSelectDept={(nom) => setFilters((f) => ({ ...f, q: nom }))}
+            picking={picking}
+            onPick={(latlng) => {
+              setPickedLL({ lat: latlng.lat, lng: latlng.lng });
+              setPicking(false);
+            }}
+            onCancelPick={() => setPicking(false)}
           />
         </div>
       </div>
       {adding && (
         <FormModal
           title="➕ Ajouter une ligne"
+          hidden={picking}
+          pickedLL={pickedLL}
+          onPickMode={() => setPicking(true)}
           onSubmit={(v) => {
             addRow(v);
             setAdding(false);
+            setPickedLL(null);
           }}
-          onCancel={() => setAdding(false)}
+          onCancel={() => { setAdding(false); setPicking(false); setPickedLL(null); }}
           submitLabel="➕ Ajouter sur la carte"
         />
       )}
@@ -298,8 +310,11 @@ export default function App() {
         <FormModal
           title={`✏️ Modifier — ${editing.departement}`}
           initial={editing}
+          hidden={picking}
+          pickedLL={pickedLL}
+          onPickMode={() => setPicking(true)}
           onSubmit={(v) => setConfirm({ kind: "save", id: editing.id, values: v })}
-          onCancel={() => setEditingId(null)}
+          onCancel={() => { setEditingId(null); setPicking(false); setPickedLL(null); }}
           submitLabel="💾 Enregistrer"
         />
       )}

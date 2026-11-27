@@ -1,10 +1,10 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { REGIONS, DEPT_BY_CODE, findCode } from "../data/france.js";
 import { ACHEMINEMENTS, STATUTS } from "../data/acheminements.js";
 
 const MAX_FILE = 800_000; // octets : au-delà, on stocke juste le nom/la taille
 
-export default function RowForm({ initial, onSubmit, onCancel, submitLabel = "Enregistrer" }) {
+export default function RowForm({ initial, onSubmit, onCancel, submitLabel = "Enregistrer", pickedLL, onPickMode }) {
   const [region, setRegion] = useState(initial?.region ?? REGIONS[0].name);
   const [code, setCode] = useState(
     initial ? findCode(initial.region, initial.departement) : ""
@@ -19,6 +19,15 @@ export default function RowForm({ initial, onSubmit, onCancel, submitLabel = "En
   const [lat, setLat] = useState(initial?.lat ?? "");
   const [lng, setLng] = useState(initial?.lng ?? "");
   const [error, setError] = useState("");
+
+  // Quand l'utilisateur a double-cliqué sur la carte en mode "picking", on pré-remplit lat/lng
+  useEffect(() => {
+    if (pickedLL) {
+      setLat(String(+pickedLL.lat.toFixed(6)));
+      setLng(String(+pickedLL.lng.toFixed(6)));
+      setError("");
+    }
+  }, [pickedLL]);
 
   const depts = useMemo(() => {
     const r = REGIONS.find((x) => x.name === region);
@@ -155,6 +164,14 @@ export default function RowForm({ initial, onSubmit, onCancel, submitLabel = "En
           </label>
         </div>
         <small className="hint">Si renseignées, le point est placé exactement ici (prioritaire sur le centroïde du département). Sinon, centroïde automatique.</small>
+        {onPickMode && (
+          <button type="button" className="mini-btn pick-btn" onClick={onPickMode} style={{ marginTop: "0.4rem" }}>
+            🗺️ Pointer sur la carte
+          </button>
+        )}
+        {onPickMode && (
+          <small className="hint">La fenêtre se masque : naviguez sur la carte et <b>double-cliquez</b> à l'endroit voulu — lat/lng seront remplis automatiquement.</small>
+        )}
       </fieldset>
 
       <fieldset>

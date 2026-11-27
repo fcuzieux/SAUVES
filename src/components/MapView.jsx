@@ -94,7 +94,25 @@ function DepartmentsLayer({ dark, onSelectDept }) {
   return null;
 }
 
-function MarkersLayer({ rows, cluster }) {
+// Mode "picking" : double-clic sur la carte -> onPick(latlng) ; double-clic-zoom désactivé pendant le choix
+function PickHandler({ picking, onPick }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!picking) return;
+    map.doubleClickZoom.disable();
+    map.getContainer().classList.add("picking");
+    const h = (e) => onPick?.(e.latlng);
+    map.on("dblclick", h);
+    return () => {
+      map.off("dblclick", h);
+      map.getContainer().classList.remove("picking");
+      map.doubleClickZoom.enable();
+    };
+  }, [map, picking, onPick]);
+  return null;
+}
+
+function MarkersLayer({ rows, cluster, picking }) {
   const map = useMap();
   useEffect(() => {
     const layer = cluster
@@ -120,7 +138,7 @@ function MarkersLayer({ rows, cluster }) {
       });
       // Survol = aperçu ; Clic = épingle/désépingle la fiche
       m.on("mouseover", () => {
-        if (!pinned.has(r.id)) m.openTooltip();
+        if (!pinned.has(r.id) && !picking) m.openTooltip();
       });
       m.on("mouseout", () => {
         if (!pinned.has(r.id)) m.closeTooltip();
@@ -167,7 +185,7 @@ function MarkersLayer({ rows, cluster }) {
       document.removeEventListener("keydown", onKey);
       map.removeLayer(layer);
     };
-  }, [map, rows, cluster]);
+  }, [map, rows, cluster, picking]);
   return null;
 }
 
@@ -210,13 +228,13 @@ function Inset({ def, rows, style }) {
         className="inset-map"
       >
         <TileLayer key={style} url={s.url} attribution={s.attr} />
-        <MarkersLayer rows={pts} cluster={false} />
+        <MarkersLayer rows={pts} cluster={false} picking={false} />
       </MapContainer>
     </div>
   );
 }
 
-export default function MapView({ rows, style, dark, onStyleChange, onSelectDept }) {
+export default function MapView({ rows, style, dark, onStyleChange, onSelectDept, picking, onPick, onCancelPick }) {
   const [view, setView] = useState("metro");
   const [cluster, setCluster] = useState(true);
   const s = MAP_STYLES[style] ?? MAP_STYLES.basic;
@@ -226,8 +244,15 @@ export default function MapView({ rows, style, dark, onStyleChange, onSelectDept
         <TileLayer key={style} url={s.url} attribution={s.attr} />
         <DepartmentsLayer dark={dark} onSelectDept={onSelectDept} />
         <FitBounds rows={rows} view={view} />
-        <MarkersLayer rows={rows} cluster={cluster} />
+        <PickHandler picking={picking} onPick={onPick} />
+        <MarkersLayer rows={rows} cluster={cluster} picking={picking} />
       </MapContainer>
+      {picking && (
+        <div className="pick-banner">
+          📍 Double-cliquez sur la carte pour définir la position
+          <button type="button" className="mini-btn" onClick={onCancelPick}>Annuler</button>
+        </div>
+      )}
       <div className="map-controls" title="Style de carte et zone">
         {Object.entries(MAP_STYLES).map(([k, v]) => (
           <button
