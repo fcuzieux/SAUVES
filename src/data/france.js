@@ -151,3 +151,12 @@ export function resolveCoords(departement) {
   const lng = found.reduce((a, d) => a + d.lng, 0) / found.length;
   return { lat, lng, zone: found[0].zone, code: found[0].code };
 }
+
+// Retrouve le code département à partir de la région + du nom (pré-remplissage du formulaire)
+export function findCode(regionName, deptName) {
+  const r = REGIONS.find((x) => x.name === regionName);
+  if (!r) return "";
+  const first = String(deptName).split("/")[0].trim();
+  const d = r.codes.map((c) => DEPARTMENTS[c]).find((d) => d.nom === first);
+  return d ? d.code : "";
+}
