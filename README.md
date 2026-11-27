@@ -11,7 +11,7 @@ de France avec encarts DOM-TOM (Guyane, Antilles, La Réunion, Mayotte).
   (plein = Routine, double anneau = Expédition en cours, tirets = Projet, pointillés + ⭐ =
   Démo faisabilité). Plusieurs statuts par ligne possibles (ex. Gironde : expédition 2026 +
   démo 2015-2017).
-- **Fiche au survol** : toutes les infos + historique + pièces jointes + boutons ✏️ Modifier /
+- **Fiche au survol, épinglable au clic** : survol = aperçu ; clic sur le point = la fiche reste ouverte et interactive (boutons ✏️/🗑 cliquables) jusqu'au prochain clic sur le point, ailleurs sur la carte, ou Échap. Toutes les infos + historique + pièces jointes + boutons ✏️ Modifier /
   🗑 Supprimer.
 - **Formulaire d'ajout / édition** : région → département dépendant, multi-acheminements,
   liste dynamique de statuts + années, note, pièces jointes (≤ 800 kB embarquées en data URL).

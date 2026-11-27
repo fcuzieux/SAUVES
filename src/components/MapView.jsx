@@ -100,18 +100,62 @@ function MarkersLayer({ rows, cluster }) {
     const layer = cluster
       ? L.markerClusterGroup({ maxClusterRadius: 45 })
       : L.layerGroup();
+    const byId = {};
+    const pinned = new Set(); // ids des fiches épinglées par un clic
+
+    const closeAll = () => {
+      pinned.clear();
+      for (const id in byId) byId[id].closeTooltip();
+    };
+
     for (const r of rows) {
       const c = resolveCoords(r.departement, r.lat, r.lng);
       const m = L.marker([c.lat, c.lng], { icon: markerIcon(r) });
       m.bindTooltip(pointCardHTML(r), {
+        permanent: true, // on gère nous-mêmes ouvrir/fermer (survol + clic)
+        interactive: true, // la fiche reste survolable et cliquable (boutons ✏️/🗑)
         direction: "top",
         offset: [0, -20],
         className: "point-tooltip",
       });
+      // Survol = aperçu ; Clic = épingle/désépingle la fiche
+      m.on("mouseover", () => {
+        if (!pinned.has(r.id)) m.openTooltip();
+      });
+      m.on("mouseout", () => {
+        if (!pinned.has(r.id)) m.closeTooltip();
+      });
+      m.on("click", (e) => {
+        L.DomEvent.stop(e); // le clic sur un point ne doit pas fermer les fiches (événement carte)
+        if (pinned.has(r.id)) {
+          pinned.delete(r.id);
+          m.closeTooltip();
+        } else {
+          closeAll();
+          pinned.add(r.id);
+          m.openTooltip();
+        }
+      });
+      byId[r.id] = m;
       layer.addLayer(m);
     }
     layer.addTo(map);
+    for (const id in byId) byId[id].closeTooltip(); // permanent = ouverte par défaut -> on referme
+
+    // Clic hors fiche (sur la carte) ou Échap -> on ferme toutes les fiches épinglées
+    const onMapClick = (e) => {
+      if (e.originalEvent?.target?.closest?.(".point-tooltip")) return; // clic DANS une fiche
+      closeAll();
+    };
+    const onKey = (e) => {
+      if (e.key === "Escape") closeAll();
+    };
+    map.on("click", onMapClick);
+    document.addEventListener("keydown", onKey);
+
     return () => {
+      map.off("click", onMapClick);
+      document.removeEventListener("keydown", onKey);
       map.removeLayer(layer);
     };
   }, [map, rows, cluster]);

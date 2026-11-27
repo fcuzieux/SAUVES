@@ -307,7 +307,7 @@ body.dark { background: #0b1220; color: #e2e8f0; }
 }
 .dept-tooltip::before { display: none; }
 
-.point-tooltip { background: transparent; border: none; box-shadow: none; padding: 0; }
+.point-tooltip { background: transparent; border: none; box-shadow: none; padding: 0; pointer-events: auto; }
 .point-tooltip::before { display: none; }
 
 .point-card {

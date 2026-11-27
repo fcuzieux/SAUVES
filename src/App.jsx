@@ -67,8 +67,9 @@ function Legend() {
         ))}
       </div>
       <p className="legend-hint">
-        💡 Clique sur un département de la carte pour filtrer. Survole un point pour voir sa fiche
-        (✏️ modifier / 🗑 supprimer).
+        💡 Clique sur un département de la carte pour filtrer. <b>Survole</b> un point pour voir sa
+        fiche, <b>clique</b> dessus pour la garder ouverte (✏️ modifier / 🗑 supprimer), puis
+        reclique sur le point, ailleurs sur la carte, ou Échap pour la fermer.
       </p>
     </div>
   );
