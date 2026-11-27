@@ -5,6 +5,15 @@ import "leaflet.markercluster";
 import { resolveCoords } from "../data/france.js";
 import { markerIcon, pointCardHTML } from "../utils/markers.js";
 
+// Clef CARTO (styles Positron / Dark Matter) : à définir dans un fichier .env à la racine
+// du projet (voir .env.example) -> VITE_CARTO_API_KEY=ta_clef
+// Obtention gratuite : https://carto.com/basemaps/apikey/ — à ajouter en ?key= sur les tuiles CARTO.
+const CARTO_KEY = import.meta.env.VITE_CARTO_API_KEY || "";
+const withCartoKey = (url) =>
+  CARTO_KEY && url.includes("cartocdn.com")
+    ? `${url}${url.includes("?") ? "&" : "?"}key=${encodeURIComponent(CARTO_KEY)}`
+    : url;
+
 export const MAP_STYLES = {
   basic: {
     label: "Basic",
@@ -13,12 +22,12 @@ export const MAP_STYLES = {
   },
   positron: {
     label: "Positron",
-    url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+    url: withCartoKey("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"),
     attr: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
   },
   dark: {
     label: "Dark Matter",
-    url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+    url: withCartoKey("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"),
     attr: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
   },
 };

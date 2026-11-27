@@ -26,6 +26,28 @@ de France avec encarts DOM-TOM (Guyane, Antilles, La Réunion, Mayotte).
 - **Persistance** `localStorage` (seed = les 42 lignes du tableau initial), réinitialisation
   possible depuis l'en-tête.
 
+## Clef API CARTO (styles Positron / Dark Matter)
+
+Depuis septembre 2026, CARTO exige une clef API pour ses dalles raster
+(`basemaps.cartocdn.com`) : sans clef, les tuiles affichent un filigrane « API KEY REQUIRED ».
+Le style **Basic (OSM) n'a pas besoin de clef**.
+
+1. Demandez une clef gratuite (sans compte) : https://carto.com/basemaps/apikey/
+   (gratuit jusqu'à 5 M requêtes/mois en non-commercial, 1 M en commercial).
+2. Copiez `.env.example` en `.env` à la racine du projet (`.env` est gitignoré, ne le committez jamais) :
+
+   ```bash
+   cp .env.example .env
+   # puis éditez .env :
+   VITE_CARTO_API_KEY=votre_clef_ici
+   ```
+
+3. Redémarrez `npm run dev`. La clef est ajoutée automatiquement en `?key=...` sur les URLs
+   des styles Positron et Dark Matter (`src/components/MapView.jsx`).
+
+> La clef est embarquée dans le bundle client (inévitable pour des tuiles servies au navigateur) :
+> protégez-la côté dashboard CARTO (restriction par référent HTTP) si besoin.
+
 ## Lancement
 
 ```bash
