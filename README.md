@@ -20,7 +20,8 @@ de France avec encarts DOM-TOM (Guyane, Antilles, La Réunion, Mayotte).
 - **Styles de carte** : Basic (OSM), Positron, Dark Matter (CARTO) via le sélecteur en haut à
   droite de la carte. **Mode sombre** 🌙 pour toute l'interface. **🖨️ Impression** de la carte.
 - **Carte améliorée** : contours des départements chargés en GeoJSON (cliquer = filtrer sur le
-  département), regroupement des points en clusters au zoom arrière (leaflet.markercluster).
+  département), regroupement des points en clusters au zoom arrière (leaflet.markercluster,
+  désactivable via le bouton 🧲 Clusters), vue 🌍 Monde incluant les DOM-TOM.
 - **Export / import** : CSV (séparateur `;`, compatible Excel) et JSON ; import de fichier
   `.csv`/`.json` (les lignes sont ajoutées à la base).
 - **Persistance** `localStorage` (seed = les 42 lignes du tableau initial), réinitialisation

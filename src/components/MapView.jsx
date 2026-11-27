@@ -165,6 +165,7 @@ function Inset({ def, rows, style }) {
 
 export default function MapView({ rows, style, dark, onStyleChange, onSelectDept }) {
   const [view, setView] = useState("metro");
+  const [cluster, setCluster] = useState(true);
   const s = MAP_STYLES[style] ?? MAP_STYLES.basic;
   return (
     <div className="map-area">
@@ -172,7 +173,7 @@ export default function MapView({ rows, style, dark, onStyleChange, onSelectDept
         <TileLayer key={style} url={s.url} attribution={s.attr} />
         <DepartmentsLayer dark={dark} onSelectDept={onSelectDept} />
         <FitBounds rows={rows} view={view} />
-        <MarkersLayer rows={rows} cluster={true} />
+        <MarkersLayer rows={rows} cluster={cluster} />
       </MapContainer>
       <div className="map-controls" title="Style de carte et zone">
         {Object.entries(MAP_STYLES).map(([k, v]) => (
@@ -201,6 +202,15 @@ export default function MapView({ rows, style, dark, onStyleChange, onSelectDept
           title="Carte mondiale : toutes les opérations, DOM-TOM compris"
         >
           🌍 Monde
+        </button>
+        <span className="ctrl-sep" />
+        <button
+          type="button"
+          className={cluster ? "active" : ""}
+          onClick={() => setCluster((c) => !c)}
+          title="Activer / désactiver le regroupement des points (clusters) selon l'échelle"
+        >
+          🧲 Clusters {cluster ? "ON" : "OFF"}
         </button>
       </div>
       <div className="insets">
