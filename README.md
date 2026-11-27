@@ -29,8 +29,12 @@ de France avec encarts DOM-TOM (Guyane, Antilles, La Réunion, Mayotte).
   « Réinitialiser » recharge ce fichier. Repli sur le seed embarqué si le fichier est illisible.
   Les modifications faites dans l'UI sont en plus persistées en `localStorage`.
 - **Position manuelle** : chaque ligne peut avoir `lat`/`lng` (champs optionnels du formulaire,
-  aussi dans le JSON/CSV) — si renseignés, le point est placé exactement là (prioritaire sur le
-  centroïde du département) ; la fiche au survol affiche « 📍 position manuelle ».
+  aussi dans le JSON/CSV, ou via le bouton 🗺️ « Pointer sur la carte » + double-clic) — si
+  renseignés, le point est placé exactement là (prioritaire sur le centroïde du département).
+- **Reverse geocoding** : dès que lat/lng est valide, le département contenant le point est trouvé
+  dans le GeoJSON des départements (métropole + DOM-TOM) et les champs **Région / Département sont
+  automatiquement remplis et verrouillés** (point hors France/DOM-TOM = erreur). Sans lat/lng,
+  l'utilisateur choisit Région puis Département (centroïde automatique).
 
 ## Clef API CARTO (styles Positron / Dark Matter)
 

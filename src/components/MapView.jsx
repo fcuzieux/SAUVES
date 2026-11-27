@@ -118,7 +118,7 @@ function MarkersLayer({ rows, cluster, picking }) {
     };
 
     for (const r of rows) {
-      const c = resolveCoords(r.departement, r.lat, r.lng);
+      const c = resolveCoords(r.departement, r.lat, r.lng, r.region);
       const m = L.marker([c.lat, c.lng], { icon: markerIcon(r) });
       m.bindTooltip(pointCardHTML(r), {
         permanent: true, // on gère nous-mêmes ouvrir/fermer (survol + clic)
@@ -184,7 +184,7 @@ function MarkersLayer({ rows, cluster, picking }) {
 function FitBounds({ rows, view }) {
   const map = useMap();
   useEffect(() => {
-    const all = rows.map((r) => resolveCoords(r.departement, r.lat, r.lng));
+    const all = rows.map((r) => resolveCoords(r.departement, r.lat, r.lng, r.region));
     // "monde" = tous les points (métropole + DOM-TOM) ; "metro" = métropole seule
     const pts = view === "monde" ? all : all.filter((c) => c.zone === "metro");
     const list = pts.length ? pts : all;
@@ -198,13 +198,15 @@ function FitBounds({ rows, view }) {
 
 const INSETS = [
   { zone: "guyane", title: "Guyane", center: [4.0, -53.1], zoom: 6 },
-  { zone: "antilles", title: "Antilles", center: [15.4, -61.3], zoom: 6 },
+  { zone: "antilles", title: "Antilles", center: [16.2, -62.2], zoom: 6 },
   { zone: "reunion", title: "La Réunion", center: [-21.1, 55.5], zoom: 9 },
   { zone: "mayotte", title: "Mayotte", center: [-12.83, 45.16], zoom: 10 },
+  { zone: "spm", title: "St-Pierre-et-Miquelon", center: [46.85, -56.3], zoom: 8 },
+  { zone: "pacifique", title: "Pacifique (COM)", center: [-18, -172], zoom: 3 },
 ];
 
 function Inset({ def, rows, style }) {
-  const pts = rows.filter((r) => resolveCoords(r.departement, r.lat, r.lng).zone === def.zone);
+  const pts = rows.filter((r) => resolveCoords(r.departement, r.lat, r.lng, r.region).zone === def.zone);
   if (!pts.length) return null;
   const s = MAP_STYLES[style] ?? MAP_STYLES.basic;
   return (

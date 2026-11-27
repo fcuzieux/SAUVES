@@ -17,6 +17,13 @@ export const REGIONS = [
   { name: "Guyane", codes: ["973"] },
   { name: "La Réunion", codes: ["974"] },
   { name: "Mayotte", codes: ["976"] },
+  // Collectivités d'outre-mer (COM) — en bas de liste, département forcé à "COM"
+  { name: "Saint-Pierre-et-Miquelon", codes: ["975"], com: true },
+  { name: "Saint-Martin", codes: ["977"], com: true },
+  { name: "Saint-Barthélemy", codes: ["978"], com: true },
+  { name: "Wallis-et-Futuna", codes: ["986"], com: true },
+  { name: "Polynésie française", codes: ["987"], com: true },
+  { name: "Nouvelle-Calédonie", codes: ["988"], com: true },
 ];
 
 // [code, nom, lat, lng, zone DOM-TOM facultative]
@@ -122,6 +129,12 @@ const RAW = [
   ["973", "Guyane", 3.93, -53.08, "guyane"],
   ["974", "La Réunion", -21.12, 55.53, "reunion"],
   ["976", "Mayotte", -12.83, 45.17, "mayotte"],
+  ["975", "Saint-Pierre-et-Miquelon", 46.85, -56.30, "spm"],
+  ["977", "Saint-Martin", 18.07, -63.05, "antilles"],
+  ["978", "Saint-Barthélemy", 17.90, -62.85, "antilles"],
+  ["986", "Wallis-et-Futuna", -13.30, 176.20, "pacifique"],
+  ["987", "Polynésie française", -17.70, -149.40, "pacifique"],
+  ["988", "Nouvelle-Calédonie", -21.30, 165.80, "pacifique"],
 ];
 
 export const DEPARTMENTS = Object.fromEntries(
@@ -142,9 +155,12 @@ const BY_NORM = Object.fromEntries(Object.values(DEPARTMENTS).map((d) => [norm(d
 // Bounding boxes des zones DOM-TOM (pour classer un lat/lng manuel)
 const DOM_BOXES = [
   { zone: "guyane", lat: [1.5, 6], lng: [-55, -51] },
-  { zone: "antilles", lat: [14, 17], lng: [-62.5, -60.3] },
+  { zone: "antilles", lat: [14, 18.3], lng: [-63.3, -60.3] },
   { zone: "reunion", lat: [-21.5, -20.7], lng: [55.2, 55.9] },
   { zone: "mayotte", lat: [-13.2, -12.5], lng: [44.9, 45.4] },
+  { zone: "spm", lat: [46.5, 47.2], lng: [-56.6, -56.0] },
+  { zone: "pacifique", lat: [-22.5, -12.5], lng: [164, 177] }, // Wallis-et-Futuna, Nouvelle-Calédonie
+  { zone: "pacifique", lat: [-24, -8], lng: [-155, -134] }, // Polynésie française
 ];
 export function zoneFromLatLng(lat, lng) {
   for (const b of DOM_BOXES) {
@@ -153,9 +169,15 @@ export function zoneFromLatLng(lat, lng) {
   return "metro";
 }
 
-// Résout la position d'une ligne : lat/lng manuels prioritaires, sinon centroïde du département
-export function resolveCoords(departement, lat, lng) {
-  const parts = String(departement)
+// Résout la position d'une ligne : lat/lng manuels prioritaires, sinon centroïde du département.
+// "COM" comme département = collectivité d'outre-mer : on retombe sur le code de la région choisie.
+export function resolveCoords(departement, lat, lng, region) {
+  let depName = String(departement);
+  if (norm(depName) === "com" && region) {
+    const r = REGIONS.find((x) => x.name === region);
+    if (r && r.codes[0]) depName = DEPARTMENTS[r.codes[0]].nom;
+  }
+  const parts = String(depName)
     .split("/")
     .map((p) => p.trim())
     .filter(Boolean);
@@ -188,6 +210,7 @@ export function regionOfCode(code) {
 export function findCode(regionName, deptName) {
   const r = REGIONS.find((x) => x.name === regionName);
   if (!r) return "";
+  if (norm(deptName) === "com") return r.codes[0] ?? ""; // COM -> code du territoire
   const first = String(deptName).split("/")[0].trim();
   const d = r.codes.map((c) => DEPARTMENTS[c]).find((d) => d.nom === first);
   return d ? d.code : "";

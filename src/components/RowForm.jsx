@@ -42,6 +42,11 @@ export default function RowForm({ initial, onSubmit, onCancel, submitLabel = "En
       setGeo(null);
       return;
     }
+    // En COM, pas besoin de reverse geocoding : le territoire est déjà choisi
+    if (isCOM && regionDef) {
+      setGeo({ code: regionDef.codes[0], nom: "COM", region });
+      return;
+    }
     setGeo("loading");
     const t = setTimeout(async () => {
       try {
@@ -62,7 +67,10 @@ export default function RowForm({ initial, onSubmit, onCancel, submitLabel = "En
     }, 350);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lat, lng]);
+  }, [lat, lng, isCOM, region]);
+
+  const regionDef = REGIONS.find((x) => x.name === region);
+  const isCOM = Boolean(regionDef?.com); // collectivité d'outre-mer -> département forcé à "COM"
 
   const depts = useMemo(() => {
     const r = REGIONS.find((x) => x.name === region);
@@ -95,7 +103,7 @@ export default function RowForm({ initial, onSubmit, onCancel, submitLabel = "En
 
   const submit = (e) => {
     e.preventDefault();
-    if (!code) return setError("Choisis un département.");
+    if (!isCOM && !code) return setError("Choisis un département.");
     if (!beneficiaire.trim()) return setError("Renseigne le bénéficiaire (ex. « 2 CHG »).");
     if (!achs.length) return setError("Coche au moins un type d'acheminement.");
     if (!statuts.length) return setError("Ajoute au moins un statut.");
@@ -114,7 +122,7 @@ export default function RowForm({ initial, onSubmit, onCancel, submitLabel = "En
     }
     onSubmit({
       region,
-      departement: DEPT_BY_CODE[code].nom,
+      departement: isCOM ? "COM" : DEPT_BY_CODE[code].nom,
       beneficiaire: beneficiaire.trim(),
       acheminements: achs,
       statuts: statuts.map((s) => ({ statut: s.statut, annee: s.annee.trim() })),
@@ -128,23 +136,39 @@ export default function RowForm({ initial, onSubmit, onCancel, submitLabel = "En
   return (
     <form className="row-form" onSubmit={submit}>
       <label>
-        Région
-        <select value={region} disabled={hasLL} onChange={(e) => { setRegion(e.target.value); setCode(""); }}>
+        Région/Collectivité
+        <select
+          value={region}
+          disabled={hasLL}
+          onChange={(e) => {
+            const v = e.target.value;
+            const def = REGIONS.find((x) => x.name === v);
+            setRegion(v);
+            setCode(def?.com ? def.codes[0] : ""); // COM -> code du territoire, département affiché "COM"
+          }}
+        >
           {REGIONS.map((r) => (
-            <option key={r.name} value={r.name}>{r.name}</option>
+            <option key={r.name} value={r.name}>{r.name}{r.com ? " (COM)" : ""}</option>
           ))}
         </select>
       </label>
 
       <label>
         Département
-        <select value={code} disabled={hasLL} onChange={(e) => setCode(e.target.value)}>
-          <option value="">— choisir —</option>
-          {depts.map((d) => (
-            <option key={d.code} value={d.code}>{d.nom} ({d.code})</option>
-          ))}
-        </select>
-        {hasLL && (
+        {isCOM ? (
+          <select value="COM" disabled>
+            <option value="COM">COM</option>
+          </select>
+        ) : (
+          <select value={code} disabled={hasLL} onChange={(e) => setCode(e.target.value)}>
+            <option value="">— choisir —</option>
+            {depts.map((d) => (
+              <option key={d.code} value={d.code}>{d.nom} ({d.code})</option>
+            ))}
+          </select>
+        )}
+        {isCOM && <small className="hint">Collectivité d'outre-mer : département = COM.</small>}
+        {hasLL && !isCOM && (
           <small className="hint">
             {geo === "loading" && "🔍 Recherche du département…"}
             {geo && geo !== "loading" && geo !== "none" && `📍 ${geo.nom} (${geo.code}) — ${geo.region} (détecté automatiquement depuis lat/lng)`}

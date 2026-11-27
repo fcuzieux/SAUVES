@@ -14,7 +14,7 @@ export default function FilterBar({ filters, setFilters }) {
         onChange={(e) => set("q", e.target.value)}
       />
       <select value={filters.region} onChange={(e) => set("region", e.target.value)} title="Région">
-        <option value="all">Toutes régions</option>
+        <option value="all">Toutes régions / collectivités</option>
         {REGIONS.map((r) => (
           <option key={r.name} value={r.name}>{r.name}</option>
         ))}
