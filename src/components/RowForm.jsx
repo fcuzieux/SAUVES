@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { REGIONS, DEPT_BY_CODE, findCode } from "../data/france.js";
+import { REGIONS, DEPT_BY_CODE, findCode, regionOfCode } from "../data/france.js";
 import { ACHEMINEMENTS, STATUTS } from "../data/acheminements.js";
+import { findDeptAt } from "../utils/geo.js";
 
 const MAX_FILE = 800_000; // octets : au-delà, on stocke juste le nom/la taille
 
@@ -28,6 +29,40 @@ export default function RowForm({ initial, onSubmit, onCancel, submitLabel = "En
       setError("");
     }
   }, [pickedLL]);
+
+  // Reverse geocoding : si lat/lng valides -> on cherche le département contenant le point
+  // et on verrouille + remplit Région / Département automatiquement
+  const latOk = lat.trim() !== "" && Number.isFinite(+lat) && Math.abs(+lat) <= 90;
+  const lngOk = lng.trim() !== "" && Number.isFinite(+lng) && Math.abs(+lng) <= 180;
+  const hasLL = latOk && lngOk;
+  const [geo, setGeo] = useState(null); // null | "loading" | "none" | { code, nom, region }
+
+  useEffect(() => {
+    if (!hasLL) {
+      setGeo(null);
+      return;
+    }
+    setGeo("loading");
+    const t = setTimeout(async () => {
+      try {
+        const d = await findDeptAt(+lat, +lng);
+        if (d && d.code) {
+          const region = regionOfCode(d.code);
+          setGeo({ ...d, region });
+          if (region) {
+            setRegion(region);
+            setCode(d.code);
+          }
+        } else {
+          setGeo("none");
+        }
+      } catch {
+        setGeo("none");
+      }
+    }, 350);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lat, lng]);
 
   const depts = useMemo(() => {
     const r = REGIONS.find((x) => x.name === region);
@@ -72,6 +107,11 @@ export default function RowForm({ initial, onSubmit, onCancel, submitLabel = "En
     if (hasLat && (!Number.isFinite(la) || !Number.isFinite(ln) || Math.abs(la) > 90 || Math.abs(ln) > 180)) {
       return setError("Coordonnées invalides (lat -90..90, lng -180..180).");
     }
+    if (hasLL) {
+      if (geo === "loading") return setError("Résolution du département en cours…");
+      if (geo === "none" || !geo) return setError("Ce point n'est pas en France / DOM-TOM : effacez lat/lng ou choisissez Région + Département.");
+      if (!code) return setError("Département non résolu pour ce point.");
+    }
     onSubmit({
       region,
       departement: DEPT_BY_CODE[code].nom,
@@ -89,7 +129,7 @@ export default function RowForm({ initial, onSubmit, onCancel, submitLabel = "En
     <form className="row-form" onSubmit={submit}>
       <label>
         Région
-        <select value={region} onChange={(e) => { setRegion(e.target.value); setCode(""); }}>
+        <select value={region} disabled={hasLL} onChange={(e) => { setRegion(e.target.value); setCode(""); }}>
           {REGIONS.map((r) => (
             <option key={r.name} value={r.name}>{r.name}</option>
           ))}
@@ -98,12 +138,20 @@ export default function RowForm({ initial, onSubmit, onCancel, submitLabel = "En
 
       <label>
         Département
-        <select value={code} onChange={(e) => setCode(e.target.value)}>
+        <select value={code} disabled={hasLL} onChange={(e) => setCode(e.target.value)}>
           <option value="">— choisir —</option>
           {depts.map((d) => (
             <option key={d.code} value={d.code}>{d.nom} ({d.code})</option>
           ))}
         </select>
+        {hasLL && (
+          <small className="hint">
+            {geo === "loading" && "🔍 Recherche du département…"}
+            {geo && geo !== "loading" && geo !== "none" && `📍 ${geo.nom} (${geo.code}) — ${geo.region} (détecté automatiquement depuis lat/lng)`}
+            {geo === "none" && "⚠️ Ce point n'est pas en France / DOM-TOM"}
+            {!geo && "🔍…"}
+          </small>
+        )}
       </label>
 
       <label>
@@ -164,6 +212,11 @@ export default function RowForm({ initial, onSubmit, onCancel, submitLabel = "En
           </label>
         </div>
         <small className="hint">Si renseignées, le point est placé exactement ici (prioritaire sur le centroïde du département). Sinon, centroïde automatique.</small>
+        {hasLL && (
+          <button type="button" className="mini-btn danger" style={{ marginTop: "0.4rem" }} onClick={() => { setLat(""); setLng(""); setGeo(null); }}>
+            ✕ Effacer lat/lng (repasser en choix manuel Région/Département)
+          </button>
+        )}
         {onPickMode && (
           <button type="button" className="mini-btn pick-btn" onClick={onPickMode} style={{ marginTop: "0.4rem" }}>
             🗺️ Pointer sur la carte

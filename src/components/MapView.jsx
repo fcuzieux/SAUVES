@@ -4,6 +4,7 @@ import L from "leaflet";
 import "leaflet.markercluster";
 import { resolveCoords } from "../data/france.js";
 import { markerIcon, pointCardHTML } from "../utils/markers.js";
+import { loadDeptGeo, deptProps } from "../utils/geo.js";
 
 // Clef CARTO (styles Positron / Dark Matter) : à définir dans un fichier .env à la racine
 // du projet (voir .env.example) -> VITE_CARTO_API_KEY=ta_clef
@@ -32,34 +33,6 @@ export const MAP_STYLES = {
   },
 };
 
-const DEPT_SOURCES = [
-  "https://raw.githubusercontent.com/gregoiredavid/france-geojson/master/departements-avec-outre-mer.geojson",
-  "https://raw.githubusercontent.com/codeforgermany/click_that_hood/main/public/data/france-departments.geojson",
-];
-let deptCache = null;
-async function loadDepts() {
-  if (deptCache) return deptCache;
-  for (const url of DEPT_SOURCES) {
-    try {
-      const r = await fetch(url);
-      if (r.ok) {
-        deptCache = await r.json();
-        return deptCache;
-      }
-    } catch {
-      /* essaie la source suivante */
-    }
-  }
-  return null;
-}
-
-const deptProps = (f) => {
-  const p = f.properties || {};
-  return {
-    code: String(p.code ?? p.code_insee ?? p.CODE_DEPT ?? ""),
-    nom: String(p.nom ?? p.NOM_DEPT ?? p.name ?? ""),
-  };
-};
 const deptStyle = (dark) => ({
   color: dark ? "#475569" : "#94a3b8",
   weight: 1,
@@ -76,7 +49,7 @@ function DepartmentsLayer({ dark, onSelectDept, picking }) {
   useEffect(() => {
     let cancelled = false;
     let l = null;
-    loadDepts().then((data) => {
+    loadDeptGeo().then((data) => {
       if (cancelled || !data) return;
       l = L.geoJSON(data, {
         style: () => deptStyle(dark),

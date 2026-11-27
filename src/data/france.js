@@ -178,6 +178,12 @@ export function resolveCoords(departement, lat, lng) {
   return base;
 }
 
+// Région correspondant à un code département (pour le reverse geocoding)
+export function regionOfCode(code) {
+  const r = REGIONS.find((x) => x.codes.includes(String(code)));
+  return r ? r.name : "";
+}
+
 // Retrouve le code département à partir de la région + du nom (pré-remplissage du formulaire)
 export function findCode(regionName, deptName) {
   const r = REGIONS.find((x) => x.name === regionName);
