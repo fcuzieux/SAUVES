@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet.markercluster";
 import { resolveCoords, zoneGroup, DEPARTMENTS } from "../data/france.js";
-import { markerIcon, pointCardHTML, overlayCardHTML, computeOverlaySummary } from "../utils/markers.js";
+import { markerIcon, pointCardHTML, overlayCardHTML, computeOverlaySummary, sizeForRow } from "../utils/markers.js";
 import { loadDeptGeo, loadRegionGeo, deptProps, regionProps } from "../utils/geo.js";
 
 // Clef CARTO (styles Positron / Dark Matter) : à définir dans un fichier .env à la racine
@@ -176,6 +176,45 @@ function MarkersLayer({ rows, cluster, picking }) {
     layer.addTo(map);
     for (const id in byId) byId[id].closeTooltip(); // permanent = ouverte par défaut -> on referme
 
+    // --- Spiderfy manuel quand le clustering est OFF : les points de mêmes coordonnées
+    // sont disposés en cercle autour du vrai point, avec un trait pointillé vers le centroïde ---
+    let spiderLines = [];
+    const layout = () => {
+      for (const ln of spiderLines) map.removeLayer(ln);
+      spiderLines = [];
+      if (cluster) return; // en mode cluster, c'est markercluster qui spiderfie au clic
+      const groups = new Map();
+      for (const r of rows) {
+        const c = resolveCoords(r.departement, r.lat, r.lng, r.region);
+        const key = `${c.lat.toFixed(5)},${c.lng.toFixed(5)}`;
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push({ r, c });
+      }
+      for (const grp of groups.values()) {
+        if (grp.length < 2) continue;
+        const n = grp.length;
+        grp.forEach((it, i) => {
+          const angle = (2 * Math.PI * i) / n - Math.PI / 2;
+          const radiusPx = Math.max(24, sizeForRow(it.r) * 0.8 + 12);
+          const centerPt = map.latLngToContainerPoint([it.c.lat, it.c.lng]);
+          const ll = map.containerPointToLatLng(
+            centerPt.add(L.point(Math.cos(angle) * radiusPx, Math.sin(angle) * radiusPx))
+          );
+          byId[it.r.id]?.setLatLng(ll);
+          const line = L.polyline([[it.c.lat, it.c.lng], ll], {
+            color: "#94a3b8",
+            weight: 1,
+            dashArray: "3 3",
+            interactive: false,
+          });
+          line.addTo(map);
+          spiderLines.push(line);
+        });
+      }
+    };
+    layout();
+    map.on("zoomend", layout); // le décalage en pixels suit le zoom
+
     // Clic hors fiche (sur la carte) ou Échap -> on ferme toutes les fiches épinglées
     const onMapClick = (e) => {
       if (e.originalEvent?.target?.closest?.(".point-tooltip")) return; // clic DANS une fiche
@@ -197,8 +236,10 @@ function MarkersLayer({ rows, cluster, picking }) {
     return () => {
       map.off("click", onMapClick);
       map.off("zoomend", closeUnpinned);
+      map.off("zoomend", layout);
       if (cluster && layer.off) layer.off("animationend", closeUnpinned);
       document.removeEventListener("keydown", onKey);
+      for (const ln of spiderLines) map.removeLayer(ln);
       map.removeLayer(layer);
     };
   }, [map, rows, cluster, picking]);
