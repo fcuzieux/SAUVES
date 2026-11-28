@@ -1,2 +1,6 @@
 node_modules/
 dist/
+# secrets locaux (ne JAMAIS committer .env)
+.env
+.env.local
+.env.*.local

@@ -1,0 +1,1024 @@
+[
+  {
+    "id": "s01",
+    "region": "Auvergne-Rhône-Alpes",
+    "departement": "Drôme",
+    "beneficiaire": "3 CHG",
+    "acheminements": [
+      "prelevements"
+    ],
+    "statuts": [
+      {
+        "statut": "routine",
+        "annee": "2027"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s02",
+    "region": "Auvergne-Rhône-Alpes",
+    "departement": "Ardèche",
+    "beneficiaire": "3 CHG",
+    "acheminements": [
+      "prelevements"
+    ],
+    "statuts": [
+      {
+        "statut": "routine",
+        "annee": "2027"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s03",
+    "region": "Auvergne-Rhône-Alpes",
+    "departement": "Rhône",
+    "beneficiaire": "4 CHG",
+    "acheminements": [
+      "prelevements",
+      "medicaments"
+    ],
+    "statuts": [
+      {
+        "statut": "routine",
+        "annee": "2025"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s04",
+    "region": "Auvergne-Rhône-Alpes",
+    "departement": "Rhône",
+    "beneficiaire": "SIS",
+    "acheminements": [
+      "secours"
+    ],
+    "statuts": [
+      {
+        "statut": "expedition",
+        "annee": ""
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s05",
+    "region": "Auvergne-Rhône-Alpes",
+    "departement": "Haute-Savoie",
+    "beneficiaire": "Gendarmerie",
+    "acheminements": [
+      "secours"
+    ],
+    "statuts": [
+      {
+        "statut": "routine",
+        "annee": ""
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s06",
+    "region": "Auvergne-Rhône-Alpes",
+    "departement": "Savoie",
+    "beneficiaire": "Mairie",
+    "acheminements": [
+      "secours"
+    ],
+    "statuts": [
+      {
+        "statut": "routine",
+        "annee": ""
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s07",
+    "region": "Bourgogne-Franche-Comté",
+    "departement": "Saône-et-Loire",
+    "beneficiaire": "4 CHG",
+    "acheminements": [
+      "prelevements",
+      "medicaments",
+      "materiel"
+    ],
+    "statuts": [
+      {
+        "statut": "expedition",
+        "annee": "2025"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s08",
+    "region": "Grand Est",
+    "departement": "Meurthe-et-Moselle",
+    "beneficiaire": "1 CHU + 3 CHG",
+    "acheminements": [
+      "prelevements"
+    ],
+    "statuts": [
+      {
+        "statut": "routine",
+        "annee": "2027"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s09",
+    "region": "Grand Est",
+    "departement": "Marne",
+    "beneficiaire": "1 CHU + 1 CHG",
+    "acheminements": [
+      "prelevements"
+    ],
+    "statuts": [
+      {
+        "statut": "expedition",
+        "annee": "2025"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s10",
+    "region": "Grand Est",
+    "departement": "Moselle",
+    "beneficiaire": "2 CHG",
+    "acheminements": [
+      "prelevements"
+    ],
+    "statuts": [
+      {
+        "statut": "expedition",
+        "annee": "2025"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s11",
+    "region": "Guyane",
+    "departement": "Guyane",
+    "beneficiaire": "2 CHG",
+    "acheminements": [
+      "prelevements"
+    ],
+    "statuts": [
+      {
+        "statut": "routine",
+        "annee": "2027"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s12",
+    "region": "Hauts-de-France",
+    "departement": "Somme",
+    "beneficiaire": "1 CHU + 2 CHG",
+    "acheminements": [
+      "prelevements",
+      "biberons"
+    ],
+    "statuts": [
+      {
+        "statut": "expedition",
+        "annee": "2024"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s13",
+    "region": "Hauts-de-France",
+    "departement": "Nord",
+    "beneficiaire": "2 CHG",
+    "acheminements": [
+      "prelevements"
+    ],
+    "statuts": [
+      {
+        "statut": "routine",
+        "annee": "2025"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s14",
+    "region": "Hauts-de-France",
+    "departement": "Nord",
+    "beneficiaire": "2 CHG",
+    "acheminements": [
+      "prelevements"
+    ],
+    "statuts": [
+      {
+        "statut": "routine",
+        "annee": "2026"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s15",
+    "region": "Hauts-de-France",
+    "departement": "Aisne / Nord",
+    "beneficiaire": "1 CHG + 1 Labo",
+    "acheminements": [
+      "prelevements"
+    ],
+    "statuts": [
+      {
+        "statut": "expedition",
+        "annee": "2026"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s16",
+    "region": "Hauts-de-France",
+    "departement": "Pas-de-Calais",
+    "beneficiaire": "SNSM",
+    "acheminements": [
+      "secours"
+    ],
+    "statuts": [
+      {
+        "statut": "expedition",
+        "annee": ""
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s17",
+    "region": "Île-de-France",
+    "departement": "Paris",
+    "beneficiaire": "1 CHU",
+    "acheminements": [
+      "medicaments",
+      "materiel"
+    ],
+    "statuts": [
+      {
+        "statut": "projet",
+        "annee": "2021-2023"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s18",
+    "region": "Île-de-France",
+    "departement": "Paris",
+    "beneficiaire": "SIS",
+    "acheminements": [
+      "secours"
+    ],
+    "statuts": [
+      {
+        "statut": "projet",
+        "annee": "2015"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s19",
+    "region": "Normandie",
+    "departement": "Manche",
+    "beneficiaire": "1 GrpeBioPriv",
+    "acheminements": [
+      "prelevements",
+      "medicaments"
+    ],
+    "statuts": [
+      {
+        "statut": "demo",
+        "annee": "2023"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s20",
+    "region": "Normandie",
+    "departement": "Eure / Orne",
+    "beneficiaire": "1 CHG + 1 Labo",
+    "acheminements": [
+      "prelevements"
+    ],
+    "statuts": [
+      {
+        "statut": "routine",
+        "annee": "2024"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s21",
+    "region": "Normandie",
+    "departement": "Eure",
+    "beneficiaire": "2 CHG",
+    "acheminements": [
+      "prelevements"
+    ],
+    "statuts": [
+      {
+        "statut": "expedition",
+        "annee": "2024"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s22",
+    "region": "Normandie",
+    "departement": "Manche",
+    "beneficiaire": "2 CHG",
+    "acheminements": [
+      "prelevements"
+    ],
+    "statuts": [
+      {
+        "statut": "projet",
+        "annee": "2025"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s23",
+    "region": "Normandie",
+    "departement": "Seine-Maritime",
+    "beneficiaire": "1 CHU + 1 CHG",
+    "acheminements": [
+      "prelevements"
+    ],
+    "statuts": [
+      {
+        "statut": "expedition",
+        "annee": "2025"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s24",
+    "region": "Normandie",
+    "departement": "Seine-Maritime",
+    "beneficiaire": "1 CHU",
+    "acheminements": [
+      "defibrillateur"
+    ],
+    "statuts": [
+      {
+        "statut": "expedition",
+        "annee": "2024"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s25",
+    "region": "Normandie",
+    "departement": "Seine-Maritime",
+    "beneficiaire": "1 CHU",
+    "acheminements": [
+      "defibrillateur"
+    ],
+    "statuts": [
+      {
+        "statut": "expedition",
+        "annee": "2024"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s26",
+    "region": "Nouvelle-Aquitaine",
+    "departement": "Pyrénées-Atlantiques",
+    "beneficiaire": "1 CHG",
+    "acheminements": [
+      "prelevements"
+    ],
+    "statuts": [
+      {
+        "statut": "routine",
+        "annee": "2027"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s27",
+    "region": "Nouvelle-Aquitaine",
+    "departement": "Gironde",
+    "beneficiaire": "1 CHU",
+    "acheminements": [
+      "prelevements",
+      "medicaments",
+      "sang"
+    ],
+    "statuts": [
+      {
+        "statut": "expedition",
+        "annee": "2026"
+      },
+      {
+        "statut": "demo",
+        "annee": "2015-2017"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s28",
+    "region": "Nouvelle-Aquitaine",
+    "departement": "Landes",
+    "beneficiaire": "SNSM",
+    "acheminements": [
+      "secours"
+    ],
+    "statuts": [
+      {
+        "statut": "routine",
+        "annee": ""
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s29",
+    "region": "Occitanie",
+    "departement": "Ariège",
+    "beneficiaire": "4 Labos + 1 GrpeBioPriv",
+    "acheminements": [
+      "prelevements"
+    ],
+    "statuts": [
+      {
+        "statut": "routine",
+        "annee": "2026"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s30",
+    "region": "Occitanie",
+    "departement": "Gard",
+    "beneficiaire": "2 CHG",
+    "acheminements": [
+      "prelevements"
+    ],
+    "statuts": [
+      {
+        "statut": "routine",
+        "annee": "2027"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s31",
+    "region": "Occitanie",
+    "departement": "Hérault",
+    "beneficiaire": "1 Clinq + 1 Labo + 1 GrpeBioPriv",
+    "acheminements": [
+      "prelevements"
+    ],
+    "statuts": [
+      {
+        "statut": "expedition",
+        "annee": "2023"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s32",
+    "region": "Occitanie",
+    "departement": "Haute-Garonne",
+    "beneficiaire": "1 CHU",
+    "acheminements": [
+      "prelevements",
+      "sang"
+    ],
+    "statuts": [
+      {
+        "statut": "projet",
+        "annee": ""
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s33",
+    "region": "Occitanie",
+    "departement": "Hautes-Pyrénées",
+    "beneficiaire": "CRS-Gendarmerie-SIS",
+    "acheminements": [
+      "secours"
+    ],
+    "statuts": [
+      {
+        "statut": "routine",
+        "annee": ""
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s34",
+    "region": "Occitanie",
+    "departement": "Hérault",
+    "beneficiaire": "Mairie",
+    "acheminements": [
+      "secours"
+    ],
+    "statuts": [
+      {
+        "statut": "projet",
+        "annee": ""
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s35",
+    "region": "Occitanie",
+    "departement": "Aude",
+    "beneficiaire": "SIS",
+    "acheminements": [
+      "secours"
+    ],
+    "statuts": [
+      {
+        "statut": "expedition",
+        "annee": "2023"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s36",
+    "region": "Pays de la Loire",
+    "departement": "Mayenne",
+    "beneficiaire": "3 CHG",
+    "acheminements": [
+      "prelevements"
+    ],
+    "statuts": [
+      {
+        "statut": "routine",
+        "annee": "2027"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s37",
+    "region": "Pays de la Loire",
+    "departement": "Loire-Atlantique",
+    "beneficiaire": "1 CHU",
+    "acheminements": [
+      "greffons"
+    ],
+    "statuts": [
+      {
+        "statut": "aucun",
+        "annee": ""
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s38",
+    "region": "Pays de la Loire",
+    "departement": "Loire-Atlantique",
+    "beneficiaire": "1 CHU",
+    "acheminements": [
+      "prelevements",
+      "materiel"
+    ],
+    "statuts": [
+      {
+        "statut": "projet",
+        "annee": "2023-2025"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s39",
+    "region": "Provence-Alpes-Côte d'Azur",
+    "departement": "Bouches-du-Rhône / Vaucluse",
+    "beneficiaire": "2 CHG",
+    "acheminements": [
+      "prelevements"
+    ],
+    "statuts": [
+      {
+        "statut": "expedition",
+        "annee": "2025"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s40",
+    "region": "Provence-Alpes-Côte d'Azur",
+    "departement": "Alpes-Maritimes",
+    "beneficiaire": "CRS",
+    "acheminements": [
+      "secours"
+    ],
+    "statuts": [
+      {
+        "statut": "expedition",
+        "annee": ""
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s41",
+    "region": "Provence-Alpes-Côte d'Azur",
+    "departement": "Var",
+    "beneficiaire": "SIS",
+    "acheminements": [
+      "secours"
+    ],
+    "statuts": [
+      {
+        "statut": "projet",
+        "annee": "2017-2018"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  },
+  {
+    "id": "s42",
+    "region": "La Réunion",
+    "departement": "La Réunion",
+    "beneficiaire": "3 Clinq + 1 GrpeBioPriv",
+    "acheminements": [
+      "prelevements"
+    ],
+    "statuts": [
+      {
+        "statut": "routine",
+        "annee": "2027"
+      }
+    ],
+    "note": "",
+    "files": [],
+    "history": [
+      {
+        "t": "2026-06-22T00:00:00.000Z",
+        "action": "création",
+        "detail": "import du tableau initial"
+      }
+    ]
+  }
+]
