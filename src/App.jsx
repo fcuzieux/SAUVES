@@ -36,18 +36,29 @@ function loadStored() {
   return null;
 }
 
-function Legend() {
+function Legend({ rows, hiddenAchs, onToggleAch, view, onViewChange }) {
+  const counts = {};
+  for (const r of rows) for (const a of r.acheminements || []) counts[a] = (counts[a] || 0) + 1;
   return (
     <div className="legend">
       <h2>Légende</h2>
+      <p className="legend-count">
+        {rows.length} ligne{rows.length > 1 ? "s" : ""} en activité. Zoomez ou cliquez sur un
+        département pour les voir.
+      </p>
       <div className="legend-block">
         <h3>Types d'acheminement</h3>
-        {ACHEMINEMENTS.map((a) => (
-          <div key={a.id} className="legend-item">
-            <span className="legend-dot" style={{ background: a.color }}>{a.icon}</span>
-            {a.label}
-          </div>
-        ))}
+        {ACHEMINEMENTS.map((a) => {
+          const hidden = hiddenAchs.has(a.id);
+          return (
+            <label key={a.id} className="legend-item legend-toggle">
+              <input type="checkbox" checked={!hidden} onChange={() => onToggleAch(a.id)} />
+              <span className="legend-dot" style={{ background: a.color, opacity: hidden ? 0.3 : 1 }}>{a.icon}</span>
+              <span className="legend-label" style={{ opacity: hidden ? 0.45 : 1 }}>{a.label}</span>
+              <span className="legend-n">{counts[a.id] || 0}</span>
+            </label>
+          );
+        })}
       </div>
       <div className="legend-block">
         <h3>Statuts (bordure du point)</h3>
@@ -66,6 +77,21 @@ function Legend() {
             {s.label}
           </div>
         ))}
+      </div>
+      <div className="legend-block">
+        <h3>Territoire</h3>
+        <div className="view-btns">
+          {[
+            ["hexagone", "Hexagone"],
+            ["monde", "🌍 Monde"],
+            ["dom", "DOM"],
+            ["com", "COM"],
+          ].map(([v, l]) => (
+            <button key={v} type="button" className={view === v ? "active" : ""} onClick={() => onViewChange(v)}>
+              {l}
+            </button>
+          ))}
+        </div>
       </div>
       <p className="legend-hint">
         💡 Clique sur un département de la carte pour filtrer. <b>Survole</b> un point pour voir sa
@@ -86,6 +112,16 @@ export default function App() {
   const [adding, setAdding] = useState(false);
   const [picking, setPicking] = useState(false);
   const [pickedLL, setPickedLL] = useState(null);
+  const [view, setView] = useState("hexagone"); // hexagone | monde | dom | com
+  const [hiddenAchs, setHiddenAchs] = useState(() => new Set()); // types d'acheminement masqués
+
+  const toggleAchVisibility = (id) =>
+    setHiddenAchs((prev) => {
+      const n = new Set(prev);
+      if (n.has(id)) n.delete(id);
+      else n.add(id);
+      return n;
+    });
   const [confirm, setConfirm] = useState(null); // { kind: "delete", row } | { kind: "save", id, values }
   const [notice, setNotice] = useState("");
   const fileRef = useRef(null);
@@ -130,6 +166,7 @@ export default function App() {
     const q = filters.q.trim().toLowerCase();
     const annee = filters.annee.trim();
     return rows.filter((r) => {
+      if (hiddenAchs.size && !(r.acheminements || []).some((a) => !hiddenAchs.has(a))) return false;
       if (filters.region !== "all" && r.region !== filters.region) return false;
       if (filters.ach !== "all" && !(r.acheminements || []).includes(filters.ach)) return false;
       if (filters.statut !== "all" && !(r.statuts || []).some((s) => s.statut === filters.statut))
@@ -146,7 +183,7 @@ export default function App() {
       }
       return true;
     });
-  }, [rows, filters]);
+  }, [rows, filters, hiddenAchs]);
 
   // Délégation de clics pour les boutons ✏️/🗑 rendus en HTML dans les tooltips Leaflet
   useEffect(() => {
@@ -272,7 +309,13 @@ export default function App() {
               ➕ Ajouter une ligne
             </button>
           </div>
-          <Legend />
+          <Legend
+            rows={rows}
+            hiddenAchs={hiddenAchs}
+            onToggleAch={toggleAchVisibility}
+            view={view}
+            onViewChange={setView}
+          />
         </aside>
         <div className="map-col">
           <FilterBar filters={filters} setFilters={setFilters} />
@@ -282,6 +325,7 @@ export default function App() {
             dark={dark}
             onStyleChange={setMapStyle}
             onSelectDept={(nom) => setFilters((f) => ({ ...f, q: nom }))}
+            view={view}
             picking={picking}
             onPick={(latlng) => {
               setPickedLL({ lat: latlng.lat, lng: latlng.lng });

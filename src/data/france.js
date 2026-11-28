@@ -200,6 +200,16 @@ export function resolveCoords(departement, lat, lng, region) {
   return base;
 }
 
+// Groupe de territoire pour les boutons de vue : hexagone / dom / com
+export const DOM_ZONES = ["guyane", "antilles", "reunion", "mayotte"];
+export const COM_ZONES = ["spm", "pacifique"];
+export function zoneGroup(zone) {
+  if (zone === "metro") return "hexagone";
+  if (DOM_ZONES.includes(zone)) return "dom";
+  if (COM_ZONES.includes(zone)) return "com";
+  return "hexagone";
+}
+
 // Région correspondant à un code département (pour le reverse geocoding)
 export function regionOfCode(code) {
   const r = REGIONS.find((x) => x.codes.includes(String(code)));

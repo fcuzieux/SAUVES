@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet.markercluster";
-import { resolveCoords } from "../data/france.js";
+import { resolveCoords, zoneGroup } from "../data/france.js";
 import { markerIcon, pointCardHTML } from "../utils/markers.js";
 import { loadDeptGeo, deptProps } from "../utils/geo.js";
 
@@ -181,17 +181,23 @@ function MarkersLayer({ rows, cluster, picking }) {
   return null;
 }
 
+// Bounds de repli si aucun point dans le territoire demandé
+const FALLBACK_BOUNDS = {
+  hexagone: [[41.5, -5.5], [51.5, 9.8]],
+  dom: [[-22, -64], [19, 57]],
+  com: [[-25, -180], [48, 180]],
+  monde: [[-60, -180], [78, 180]],
+};
+
 function FitBounds({ rows, view }) {
   const map = useMap();
   useEffect(() => {
     const all = rows.map((r) => resolveCoords(r.departement, r.lat, r.lng, r.region));
-    // "monde" = tous les points (métropole + DOM-TOM) ; "metro" = métropole seule
-    const pts = view === "monde" ? all : all.filter((c) => c.zone === "metro");
-    const list = pts.length ? pts : all;
-    if (list.length) {
-      const b = L.latLngBounds(list.map((c) => [c.lat, c.lng]));
-      if (b.isValid()) map.fitBounds(b.pad(0.12));
-    }
+    const wanted = view === "monde" ? all : all.filter((c) => zoneGroup(c.zone) === view);
+    const b = wanted.length
+      ? L.latLngBounds(wanted.map((c) => [c.lat, c.lng]))
+      : L.latLngBounds(FALLBACK_BOUNDS[view] ?? FALLBACK_BOUNDS.monde);
+    if (b.isValid()) map.fitBounds(b.pad(0.12));
   }, [rows, view, map]);
   return null;
 }
@@ -228,8 +234,7 @@ function Inset({ def, rows, style }) {
   );
 }
 
-export default function MapView({ rows, style, dark, onStyleChange, onSelectDept, picking, onPick, onCancelPick }) {
-  const [view, setView] = useState("metro");
+export default function MapView({ rows, style, dark, onStyleChange, onSelectDept, picking, onPick, onCancelPick, view }) {
   const [cluster, setCluster] = useState(true);
   const s = MAP_STYLES[style] ?? MAP_STYLES.basic;
   return (
@@ -258,23 +263,6 @@ export default function MapView({ rows, style, dark, onStyleChange, onSelectDept
             {v.label}
           </button>
         ))}
-        <span className="ctrl-sep" />
-        <button
-          type="button"
-          className={view === "metro" ? "active" : ""}
-          onClick={() => setView("metro")}
-          title="Zoom sur la France métropolitaine"
-        >
-          🇫🇷 Métropole
-        </button>
-        <button
-          type="button"
-          className={view === "monde" ? "active" : ""}
-          onClick={() => setView("monde")}
-          title="Carte mondiale : toutes les opérations, DOM-TOM compris"
-        >
-          🌍 Monde
-        </button>
         <span className="ctrl-sep" />
         <button
           type="button"
