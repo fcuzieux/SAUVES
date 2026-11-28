@@ -354,6 +354,7 @@ body.dark { background: #0b1220; color: #e2e8f0; }
   width: 260px;
   font-size: 0.78rem;
 }
+.overlay-card { width: 280px; }
 .pc-head { display: flex; flex-direction: column; margin-bottom: 0.3rem; }
 .pc-head strong { font-size: 0.9rem; }
 .pc-region { color: #64748b; font-size: 0.7rem; }

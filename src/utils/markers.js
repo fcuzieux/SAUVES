@@ -1,13 +1,8 @@
 import L from "leaflet";
 import { achById, statutById } from "../data/acheminements.js";
+import { esc, countSites } from "./summary.js";
 
-export const esc = (s) =>
-  String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-
-export function countSites(b) {
-  const n = [...String(b).matchAll(/(\d+)/g)].map((m) => +m[1]);
-  return n.length ? n.reduce((a, b) => a + b, 0) : 1;
-}
+export { esc, countSites, computeOverlaySummary, overlayCardHTML } from "./summary.js";
 
 export function sizeForRow(row) {
   return 30 + Math.min(countSites(row.beneficiaire), 6) * 5;

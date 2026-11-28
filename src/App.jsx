@@ -98,7 +98,8 @@ function Legend({ rows, hiddenAchs, onToggleAch, view, onViewChange }) {
         </div>
       </div>
       <p className="legend-hint">
-        💡 Clique sur un département de la carte pour filtrer. <b>Survole</b> un point pour voir sa
+        💡 Clique sur un département / une région de la carte pour filtrer et voir sa fiche
+        récapitulative. <b>Survole</b> un point pour voir sa
         fiche, <b>clique</b> dessus pour la garder ouverte (✏️ modifier / 🗑 supprimer), puis
         reclique sur le point, ailleurs sur la carte, ou Échap pour la fermer.
       </p>
@@ -329,6 +330,7 @@ export default function App() {
           <FilterBar filters={filters} setFilters={setFilters} />
           <MapView
             rows={filtered}
+            allRows={rows}
             style={mapStyle}
             dark={dark}
             onStyleChange={setMapStyle}
