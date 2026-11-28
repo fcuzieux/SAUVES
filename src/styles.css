@@ -248,6 +248,9 @@ body.dark { background: #0b1220; color: #e2e8f0; }
   right: 10px;
   z-index: 1000;
   display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  max-width: 70%;
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid var(--border);

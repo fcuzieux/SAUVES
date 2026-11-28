@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import MapView from "./components/MapView.jsx";
 import RowForm from "./components/RowForm.jsx";
 import FormModal from "./components/FormModal.jsx";
@@ -283,6 +283,10 @@ export default function App() {
 
   const editing = rows.find((r) => r.id === editingId) || null;
 
+  // Handlers stables (évite de recréer la couche GeoJSON à chaque rendu)
+  const onSelectDept = useCallback((nom) => setFilters((f) => ({ ...f, q: nom })), []);
+  const onSelectRegion = useCallback((nom) => setFilters((f) => ({ ...f, region: nom })), []);
+
   return (
     <div className={dark ? "app dark" : "app"}>
       <header className="app-header">
@@ -328,7 +332,8 @@ export default function App() {
             style={mapStyle}
             dark={dark}
             onStyleChange={setMapStyle}
-            onSelectDept={(nom) => setFilters((f) => ({ ...f, q: nom }))}
+            onSelectDept={onSelectDept}
+            onSelectRegion={onSelectRegion}
             view={view}
             picking={picking}
             onPick={(latlng) => {

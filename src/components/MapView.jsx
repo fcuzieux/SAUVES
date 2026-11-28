@@ -4,7 +4,7 @@ import L from "leaflet";
 import "leaflet.markercluster";
 import { resolveCoords, zoneGroup, DEPARTMENTS } from "../data/france.js";
 import { markerIcon, pointCardHTML } from "../utils/markers.js";
-import { loadDeptGeo, deptProps } from "../utils/geo.js";
+import { loadDeptGeo, loadRegionGeo, deptProps, regionProps } from "../utils/geo.js";
 
 // Clef CARTO (styles Positron / Dark Matter) : à définir dans un fichier .env à la racine
 // du projet (voir .env.example) -> VITE_CARTO_API_KEY=ta_clef
@@ -39,8 +39,15 @@ const deptStyle = (dark) => ({
   fillColor: "#0ea5e9",
   fillOpacity: dark ? 0.06 : 0.04,
 });
+const regionStyle = (dark) => ({
+  color: dark ? "#334155" : "#64748b",
+  weight: 2,
+  fillColor: "#0ea5e9",
+  fillOpacity: dark ? 0.05 : 0.03,
+});
 
-function DepartmentsLayer({ dark, onSelectDept, picking }) {
+// Couche d'overlay : "departements" | "regions" | "none" (masquée pendant le picking)
+function OverlayLayer({ mode, dark, picking, onSelectDept, onSelectRegion }) {
   const map = useMap();
   const [layer, setLayer] = useState(null);
   const pickingRef = useRef(picking);
@@ -49,30 +56,34 @@ function DepartmentsLayer({ dark, onSelectDept, picking }) {
   useEffect(() => {
     let cancelled = false;
     let l = null;
-    loadDeptGeo().then((data) => {
+    (async () => {
+      if (mode === "none") {
+        setLayer(null);
+        return;
+      }
+      const isRegion = mode === "regions";
+      const data = isRegion ? await loadRegionGeo() : await loadDeptGeo();
       if (cancelled || !data) return;
       l = L.geoJSON(data, {
-        style: () => deptStyle(dark),
+        style: () => (isRegion ? regionStyle(dark) : deptStyle(dark)),
         onEachFeature: (f, fLayer) => {
-          const { nom } = deptProps(f);
-          if (nom) fLayer.bindTooltip(nom, { sticky: true, direction: "top", className: "dept-tooltip" });
-          fLayer.on("click", () => onSelectDept?.(nom));
+          const p = isRegion ? regionProps(f) : deptProps(f);
+          if (p.nom) fLayer.bindTooltip(p.nom, { sticky: true, direction: "top", className: "dept-tooltip" });
+          fLayer.on("click", () => (isRegion ? onSelectRegion?.(p.nom) : onSelectDept?.(p.nom)));
           fLayer.on("mouseover", () => fLayer.setStyle({ weight: 3, color: "#0ea5e9", fillOpacity: 0.18 }));
           fLayer.on("mouseout", () => l && l.resetStyle(fLayer));
         },
       });
       setLayer(l);
-      // pendant le picking, on ne remet PAS le layer (il intercepterait le double-clic)
-      if (!pickingRef.current) l.addTo(map);
-    });
+      if (!pickingRef.current) l.addTo(map); // en picking, le layer reste retiré (double-clic)
+    })();
     return () => {
       cancelled = true;
       if (l) map.removeLayer(l);
       setLayer(null);
     };
-  }, [map, dark, onSelectDept]);
+  }, [map, dark, mode, onSelectDept, onSelectRegion]);
 
-  // Pendant le picking : le layer départements est retiré de la carte (le double-clic doit atteindre la carte)
   useEffect(() => {
     if (!layer) return;
     if (picking) {
@@ -244,14 +255,15 @@ function Inset({ def, rows, style }) {
   );
 }
 
-export default function MapView({ rows, style, dark, onStyleChange, onSelectDept, picking, onPick, onCancelPick, view }) {
+export default function MapView({ rows, style, dark, onStyleChange, onSelectDept, onSelectRegion, picking, onPick, onCancelPick, view }) {
   const [cluster, setCluster] = useState(true);
+  const [overlay, setOverlay] = useState("departements"); // "departements" | "regions" | "none"
   const s = MAP_STYLES[style] ?? MAP_STYLES.basic;
   return (
     <div className="map-area">
       <MapContainer center={[46.6, 2.5]} zoom={6} className="main-map">
         <TileLayer key={style} url={s.url} attribution={s.attr} />
-        <DepartmentsLayer dark={dark} onSelectDept={onSelectDept} picking={picking} />
+        <OverlayLayer mode={overlay} dark={dark} picking={picking} onSelectDept={onSelectDept} onSelectRegion={onSelectRegion} />
         <FitBounds rows={rows} view={view} />
         <PickHandler picking={picking} onPick={onPick} />
         <MarkersLayer rows={rows} cluster={cluster} picking={picking} />
@@ -282,6 +294,22 @@ export default function MapView({ rows, style, dark, onStyleChange, onSelectDept
         >
           🧲 Clusters {cluster ? "ON" : "OFF"}
         </button>
+        <span className="ctrl-sep" />
+        {[
+          ["departements", "🧩 Départements"],
+          ["regions", "🗺️ Régions"],
+          ["none", "🚫 Aucun"],
+        ].map(([v, l]) => (
+          <button
+            key={v}
+            type="button"
+            className={overlay === v ? "active" : ""}
+            onClick={() => setOverlay(v)}
+            title="Overlay affiché sur la carte"
+          >
+            {l}
+          </button>
+        ))}
       </div>
       <div className="insets">
         {INSETS.map((def) => (

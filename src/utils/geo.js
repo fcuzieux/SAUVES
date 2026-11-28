@@ -30,6 +30,37 @@ export const deptProps = (f) => {
   };
 };
 
+// --- GeoJSON des régions (pour l'overlay "régions") ---
+export const REGION_SOURCES = [
+  "https://raw.githubusercontent.com/gregoiredavid/france-geojson/master/regions-avec-outre-mer.geojson",
+  "https://raw.githubusercontent.com/gregoiredavid/france-geojson/master/regions.geojson",
+  "https://raw.githubusercontent.com/codeforgermany/click_that_hood/main/public/data/france-regions.geojson",
+];
+let regionCache = null;
+export async function loadRegionGeo() {
+  if (regionCache) return regionCache;
+  for (const url of REGION_SOURCES) {
+    try {
+      const r = await fetch(url);
+      if (r.ok) {
+        regionCache = await r.json();
+        return regionCache;
+      }
+    } catch {
+      /* source suivante */
+    }
+  }
+  return null;
+}
+
+export const regionProps = (f) => {
+  const p = f.properties || {};
+  return {
+    code: String(p.code ?? p.code_insee ?? p.CODE_REG ?? ""),
+    nom: String(p.nom ?? p.NOM_REG ?? p.name ?? ""),
+  };
+};
+
 // --- point-in-polygon (ray casting, coordonnées GeoJSON = [lng, lat]) ---
 export function pointInRing(x, y, ring) {
   let inside = false;
