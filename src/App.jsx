@@ -5,6 +5,7 @@ import FormModal from "./components/FormModal.jsx";
 import ConfirmModal from "./components/ConfirmModal.jsx";
 import FilterBar, { EMPTY_FILTERS } from "./components/FilterBar.jsx";
 import { ACHEMINEMENTS, STATUTS } from "./data/acheminements.js";
+import { REGIONS } from "./data/france.js";
 import { seed } from "./data/seed.js";
 import { normalizeRow, newId, toCSV, fromCSV, fromJSON, download, readTextFile } from "./utils/io.js";
 import { pushHistory } from "./utils/history.js";
@@ -35,6 +36,14 @@ function loadStored() {
   }
   return null;
 }
+
+// Hexagone + Monde + un bouton par DOM et par COM (ordre de la liste des régions)
+const DOM_CODES = ["971", "972", "973", "974", "976"];
+const TERRITOIRE_BOUTONS = [
+  ["hexagone", "Hexagone"],
+  ["monde", "🌍 Monde"],
+  ...REGIONS.filter((r) => r.com || DOM_CODES.includes(r.codes[0])).map((r) => [r.codes[0], r.name]),
+];
 
 function Legend({ rows, hiddenAchs, onToggleAch, view, onViewChange }) {
   const counts = {};
@@ -81,12 +90,7 @@ function Legend({ rows, hiddenAchs, onToggleAch, view, onViewChange }) {
       <div className="legend-block">
         <h3>Territoire</h3>
         <div className="view-btns">
-          {[
-            ["hexagone", "Hexagone"],
-            ["monde", "🌍 Monde"],
-            ["dom", "DOM"],
-            ["com", "COM"],
-          ].map(([v, l]) => (
+          {TERRITOIRE_BOUTONS.map(([v, l]) => (
             <button key={v} type="button" className={view === v ? "active" : ""} onClick={() => onViewChange(v)}>
               {l}
             </button>

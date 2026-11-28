@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet.markercluster";
-import { resolveCoords, zoneGroup } from "../data/france.js";
+import { resolveCoords, zoneGroup, DEPARTMENTS } from "../data/france.js";
 import { markerIcon, pointCardHTML } from "../utils/markers.js";
 import { loadDeptGeo, deptProps } from "../utils/geo.js";
 
@@ -184,19 +184,29 @@ function MarkersLayer({ rows, cluster, picking }) {
 // Bounds de repli si aucun point dans le territoire demandé
 const FALLBACK_BOUNDS = {
   hexagone: [[41.5, -5.5], [51.5, 9.8]],
-  dom: [[-22, -64], [19, 57]],
-  com: [[-25, -180], [48, 180]],
   monde: [[-60, -180], [78, 180]],
 };
+// demi-taille de la fenêtre de repli pour les grands territoires (code INSEE)
+const TERRITOIRE_DELTA = { "973": 4, "987": 5, "988": 3 };
 
 function FitBounds({ rows, view }) {
   const map = useMap();
   useEffect(() => {
     const all = rows.map((r) => resolveCoords(r.departement, r.lat, r.lng, r.region));
-    const wanted = view === "monde" ? all : all.filter((c) => zoneGroup(c.zone) === view);
-    const b = wanted.length
-      ? L.latLngBounds(wanted.map((c) => [c.lat, c.lng]))
-      : L.latLngBounds(FALLBACK_BOUNDS[view] ?? FALLBACK_BOUNDS.monde);
+    let wanted;
+    if (view === "monde") wanted = all;
+    else if (view === "hexagone") wanted = all.filter((c) => zoneGroup(c.zone) === "hexagone");
+    else wanted = all.filter((c) => c.code === view); // vue = code territoire (971, 973, 987…)
+    let b;
+    if (wanted.length) {
+      b = L.latLngBounds(wanted.map((c) => [c.lat, c.lng]));
+    } else if (view !== "hexagone" && view !== "monde" && DEPARTMENTS[view]) {
+      const d = DEPARTMENTS[view];
+      const delta = TERRITOIRE_DELTA[view] ?? 1.2;
+      b = L.latLngBounds([[d.lat - delta, d.lng - delta], [d.lat + delta, d.lng + delta]]);
+    } else {
+      b = L.latLngBounds(FALLBACK_BOUNDS[view] ?? FALLBACK_BOUNDS.monde);
+    }
     if (b.isValid()) map.fitBounds(b.pad(0.12));
   }, [rows, view, map]);
   return null;
