@@ -76,6 +76,8 @@ function OverlayLayer({ mode, dark, picking, rows, onSelectDept, onSelectRegion 
           );
           fLayer.on("click", () => {
             fLayer.openPopup();
+            // Zoom à l'échelle du territoire cliqué (et pas sur les points qu'il contient)
+            map.fitBounds(fLayer.getBounds().pad(0.12));
             if (isRegion) onSelectRegion?.(p.nom);
             else onSelectDept?.(p.nom);
           });
@@ -211,8 +213,11 @@ const TERRITOIRE_DELTA = { "973": 4, "987": 5, "988": 3 };
 
 function FitBounds({ rows, view }) {
   const map = useMap();
+  // rows via une ref : on ne refit PAS à chaque changement de filtre (seulement quand la vue change)
+  const rowsRef = useRef(rows);
+  rowsRef.current = rows;
   useEffect(() => {
-    const all = rows.map((r) => resolveCoords(r.departement, r.lat, r.lng, r.region));
+    const all = rowsRef.current.map((r) => resolveCoords(r.departement, r.lat, r.lng, r.region));
     let wanted;
     if (view === "monde") wanted = all;
     else if (view === "hexagone") wanted = all.filter((c) => zoneGroup(c.zone) === "hexagone");
@@ -228,7 +233,7 @@ function FitBounds({ rows, view }) {
       b = L.latLngBounds(FALLBACK_BOUNDS[view] ?? FALLBACK_BOUNDS.monde);
     }
     if (b.isValid()) map.fitBounds(b.pad(0.12));
-  }, [rows, view, map]);
+  }, [view, map]);
   return null;
 }
 
