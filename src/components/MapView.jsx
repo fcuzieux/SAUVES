@@ -47,7 +47,7 @@ const regionStyle = (dark) => ({
 });
 
 // Couche d'overlay : "departements" | "regions" | "none" (masquée pendant le picking)
-function OverlayLayer({ mode, dark, picking, rows, onSelectDept, onSelectRegion }) {
+function OverlayLayer({ mode, dark, picking, rows, onSelectDept, onSelectRegion, onCloseTerritory }) {
   const map = useMap();
   const [layer, setLayer] = useState(null);
   const pickingRef = useRef(picking);
@@ -81,6 +81,8 @@ function OverlayLayer({ mode, dark, picking, rows, onSelectDept, onSelectRegion 
             if (isRegion) onSelectRegion?.(p.nom);
             else onSelectDept?.(p.nom);
           });
+          // Fermeture de la fiche -> on rend toutes les lignes (filtre retiré côté App)
+          fLayer.on("popupclose", () => onCloseTerritory?.(isRegion ? "region" : "dept", p.nom));
           fLayer.on("mouseover", () => fLayer.setStyle({ weight: 3, color: "#0ea5e9", fillOpacity: 0.18 }));
           fLayer.on("mouseout", () => l && l.resetStyle(fLayer));
         },
@@ -93,7 +95,7 @@ function OverlayLayer({ mode, dark, picking, rows, onSelectDept, onSelectRegion 
       if (l) map.removeLayer(l);
       setLayer(null);
     };
-  }, [map, dark, mode, rows, onSelectDept, onSelectRegion]);
+  }, [map, dark, mode, rows, onSelectDept, onSelectRegion, onCloseTerritory]);
 
   useEffect(() => {
     if (!layer) return;
@@ -269,15 +271,23 @@ function Inset({ def, rows, style }) {
   );
 }
 
-export default function MapView({ rows, allRows, style, dark, onStyleChange, onSelectDept, onSelectRegion, picking, onPick, onCancelPick, view }) {
+export default function MapView({ rows, allRows, style, dark, onStyleChange, onSelectDept, onSelectRegion, onCloseTerritory, onOverlayModeChange, picking, onPick, onCancelPick, view }) {
   const [cluster, setCluster] = useState(true);
   const [overlay, setOverlay] = useState("departements"); // "departements" | "regions" | "none"
+
+  // Changement de mode d'overlay -> on retire le filtre de territoire (toutes les lignes réapparaissent)
+  const onOverlayModeChangeRef = useRef(onOverlayModeChange);
+  onOverlayModeChangeRef.current = onOverlayModeChange;
+  useEffect(() => {
+    onOverlayModeChangeRef.current?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [overlay]);
   const s = MAP_STYLES[style] ?? MAP_STYLES.basic;
   return (
     <div className="map-area">
       <MapContainer center={[46.6, 2.5]} zoom={6} className="main-map">
         <TileLayer key={style} url={s.url} attribution={s.attr} />
-        <OverlayLayer mode={overlay} dark={dark} picking={picking} rows={allRows ?? rows} onSelectDept={onSelectDept} onSelectRegion={onSelectRegion} />
+        <OverlayLayer mode={overlay} dark={dark} picking={picking} rows={allRows ?? rows} onSelectDept={onSelectDept} onSelectRegion={onSelectRegion} onCloseTerritory={onCloseTerritory} />
         <FitBounds rows={rows} view={view} />
         <PickHandler picking={picking} onPick={onPick} />
         <MarkersLayer rows={rows} cluster={cluster} picking={picking} />

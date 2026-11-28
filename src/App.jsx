@@ -284,9 +284,35 @@ export default function App() {
 
   const editing = rows.find((r) => r.id === editingId) || null;
 
+  // Filtre de territoire posé par un clic sur l'overlay (séparé des filtres utilisateur)
+  const territoryRef = useRef(null); // { type: "dept" | "region", value: string }
+
   // Handlers stables (évite de recréer la couche GeoJSON à chaque rendu)
-  const onSelectDept = useCallback((nom) => setFilters((f) => ({ ...f, q: nom })), []);
-  const onSelectRegion = useCallback((nom) => setFilters((f) => ({ ...f, region: nom })), []);
+  const onSelectDept = useCallback((nom) => {
+    territoryRef.current = { type: "dept", value: nom };
+    setFilters((f) => ({ ...f, q: nom }));
+  }, []);
+  const onSelectRegion = useCallback((nom) => {
+    territoryRef.current = { type: "region", value: nom };
+    setFilters((f) => ({ ...f, region: nom }));
+  }, []);
+  // Fermeture de la fiche du territoire -> on retire le filtre (toutes les lignes réapparaissent),
+  // sauf si un autre territoire a été cliqué entre-temps
+  const clearTerritory = useCallback((type, value) => {
+    const t = territoryRef.current;
+    if (t && t.type === type && t.value === value) {
+      territoryRef.current = null;
+      setFilters((f) => (t.type === "dept" ? { ...f, q: "" } : { ...f, region: "all" }));
+    }
+  }, []);
+  // Changement de mode d'overlay (départements/régions/aucun) -> on retire le filtre de territoire
+  const clearTerritoryAny = useCallback(() => {
+    const t = territoryRef.current;
+    if (t) {
+      territoryRef.current = null;
+      setFilters((f) => (t.type === "dept" ? { ...f, q: "" } : { ...f, region: "all" }));
+    }
+  }, []);
 
   return (
     <div className={dark ? "app dark" : "app"}>
@@ -336,6 +362,8 @@ export default function App() {
             onStyleChange={setMapStyle}
             onSelectDept={onSelectDept}
             onSelectRegion={onSelectRegion}
+            onCloseTerritory={clearTerritory}
+            onOverlayModeChange={clearTerritoryAny}
             view={view}
             picking={picking}
             onPick={(latlng) => {
