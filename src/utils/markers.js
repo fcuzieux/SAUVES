@@ -63,11 +63,14 @@ export function pointCardHTML(row) {
     })
     .join("");
   const files = (row.files || [])
-    .map((f) =>
-      f.dataUrl
-        ? `<a class="file-link" href="${f.dataUrl}" download="${esc(f.name)}">📎 ${esc(f.name)} <small>(${(f.size / 1024).toFixed(0)} kB)</small></a>`
-        : `<span class="file-link">📎 ${esc(f.name)} <small>(${(f.size / 1024).toFixed(0)} kB, non embarqué)</small></span>`
-    )
+    .map((f) => {
+      // Anti-XSS : on n'accepte comme lien téléchargeable que les data: (un JSON importé
+      // ne doit pas pouvoir injecter un href "javascript:...")
+      const safeUrl = typeof f.dataUrl === "string" && f.dataUrl.startsWith("data:") ? f.dataUrl : null;
+      return safeUrl
+        ? `<a class="file-link" href="${safeUrl}" download="${esc(f.name)}">📎 ${esc(f.name)} <small>(${(f.size / 1024).toFixed(0)} kB)</small></a>`
+        : `<span class="file-link">📎 ${esc(f.name)} <small>(${(f.size / 1024).toFixed(0)} kB, non embarqué)</small></span>`;
+    })
     .join("");
   const hist = (row.history || [])
     .slice(-5)

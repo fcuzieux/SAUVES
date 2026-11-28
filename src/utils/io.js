@@ -53,7 +53,9 @@ export function normalizeRow(r) {
 // ---------- CSV (séparateur ;, champs entre guillemets si besoin) ----------
 
 const csvEsc = (v) => {
-  const s = String(v ?? "");
+  let s = String(v ?? "");
+  // Anti-injection de formules Excel : =, +, -, @, tab, CR en début de cellule
+  if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
   return /[;"\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 };
 
